@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    background: linear-gradient(to bottom, #6a1b9a, #000);
+  }
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .solution-cards, .loan-cards, .card-options {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+  
+    .hero-content h1 {
+      font-size: 2rem;
+    }
+  
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.8rem 1.5rem;
+    }
+  }
+  
