@@ -32,7 +32,7 @@ import {
 import { NavLink } from 'react-router-dom';
 
 const menuItems = [
-  { icon: FiHome, text: 'Overview', path: '/' },
+  { icon: FiHome, text: 'Overview', path: '/overview' },
   { icon: FiDollarSign, text: 'Transactions', path: '/transactions' },
   { icon: FiCreditCard, text: 'Cards', path: '/cards' },
   { icon: FiFileText, text: 'Loans', path: '/loans' },

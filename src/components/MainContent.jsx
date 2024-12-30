@@ -7,11 +7,12 @@ import Goals from '../pages/Goals';
 import Rewards from '../pages/Rewards';
 import Loans from '../pages/Loans';
 import Settings from '../pages/Settings';
+import Landing from '../pages/Landing';
 
 function MainContent() {
   return (
     <Routes>
-      <Route path="/" element={<Overview />} />
+      <Route path="/overview" element={<Overview />} />
       <Route path="/transactions" element={<Transactions />} />
       <Route path="/cards" element={<Cards />} />
       <Route path="/investments" element={<Investments />} />
