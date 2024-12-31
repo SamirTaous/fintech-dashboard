@@ -16,9 +16,10 @@ const Navbar = () => {
       templateColumns="repeat(6, 1fr)"
       alignItems="center"
       p={4}
-      pl={0}
-      pr={0}
+      ml='50px'
+      mr='50px'
       borderBottom="solid 1px"
+      
     >
       {/* Brand Logo */}
       <GridItem colSpan={1}>
@@ -46,10 +47,10 @@ const Navbar = () => {
             textDecoration={activeLink === 'home' ? 'underline' : 'none'}
             mr={3}
             ml={3}
-            opacity={activeLink === 'home' ? 0.8 : 0.4}  // 80% opacity for active, 40% for others
+            opacity={activeLink === 'home' ? 0.8 : 0.4}  
             _hover={{
               textDecoration: activeLink === 'home' ? 'underline' : 'none',
-              color: 'inherit', // Prevent blue hover effect
+              color: 'inherit', 
               opacity: '0.8'
             }}
             textUnderlineOffset="12px"
@@ -65,10 +66,10 @@ const Navbar = () => {
             textDecoration={activeLink === 'services' ? 'underline' : 'none'}
             mr={3}
             ml={3}
-            opacity={activeLink === 'services' ? 0.8 : 0.4}  // 80% opacity for active, 40% for others
+            opacity={activeLink === 'services' ? 0.8 : 0.4}  
             _hover={{
               textDecoration: activeLink === 'services' ? 'underline' : 'none',
-              color: 'inherit', // Prevent blue hover effect
+              color: 'inherit', 
               opacity: '0.8'
             }}
             textUnderlineOffset="12px"
@@ -84,10 +85,10 @@ const Navbar = () => {
             textDecoration={activeLink === 'cards' ? 'underline' : 'none'}
             mr={3}
             ml={3}
-            opacity={activeLink === 'cards' ? 0.8 : 0.4}  // 80% opacity for active, 40% for others
+            opacity={activeLink === 'cards' ? 0.8 : 0.4}  
             _hover={{
               textDecoration: activeLink === 'cards' ? 'underline' : 'none',
-              color: 'inherit', // Prevent blue hover effect
+              color: 'inherit', 
               opacity: '0.8'
             }}
             textUnderlineOffset="12px"
@@ -103,10 +104,10 @@ const Navbar = () => {
             textDecoration={activeLink === 'about' ? 'underline' : 'none'}
             mr={3}
             ml={3}
-            opacity={activeLink === 'about' ? 0.8 : 0.4}  // 80% opacity for active, 40% for others
+            opacity={activeLink === 'about' ? 0.8 : 0.4}  
             _hover={{
               textDecoration: activeLink === 'about' ? 'underline' : 'none',
-              color: 'inherit', // Prevent blue hover effect
+              color: 'inherit', 
               opacity: '0.8'
             }}
             textUnderlineOffset="12px"
@@ -124,29 +125,31 @@ const Navbar = () => {
             variant="outline"
             border="1px solid black"
             borderRadius={10}
-            borderStyle="solid" // Explicitly set border style
+            borderStyle="solid" 
             _hover={{
               borderColor: "black",
-              backgroundColor: 'rgba(0, 0, 0, 0.1)', // Slightly darken background
+              backgroundColor: 'rgba(0, 0, 0, 0.1)', 
             }}
             _focus={{
-              boxShadow: 'none', // Remove focus ring
+              boxShadow: 'none', 
             }}
           >
             Get Started
           </Button>
           <Button
+            as={Link}
+            to="/overview"
             size="lg"
             variant="outline"
             borderColor="black"
             borderRadius={10}
-            borderStyle="solid" // Explicitly set border style
+            borderStyle="solid"
             _hover={{
               borderColor: "black",
-              backgroundColor: 'rgba(0, 0, 0, 0.1)', // Slightly darken background
+              backgroundColor: 'rgba(0, 0, 0, 0.1)', 
             }}
             _focus={{
-              boxShadow: 'none', // Remove focus ring
+              boxShadow: 'none', 
             }}
           >
             Login

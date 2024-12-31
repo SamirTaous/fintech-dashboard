@@ -7,6 +7,8 @@ const HeroSection = () => {
       justifyContent="space-between"
       alignItems="center"
       mt={10}
+      ml='50px'
+      mr='50px'
       flexWrap="wrap"
       position="relative"
     >
