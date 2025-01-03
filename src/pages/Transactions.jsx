@@ -1,10 +1,13 @@
+import { useEffect, useState } from 'react';
 import {
   Box,
   Grid,
   Heading,
   Text,
   Flex,
-  Input,
+  HStack,
+  VStack,
+  Button,
   Table,
   Thead,
   Tbody,
@@ -14,125 +17,68 @@ import {
   Badge,
   InputGroup,
   InputLeftElement,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  IconButton,
-  HStack,
-  VStack,
-  Button,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
+  Input,
 } from '@chakra-ui/react';
-import {
-  FaShoppingCart,
-  FaUtensils,
-  FaBriefcase,
-  FaMoneyBillWave,
-  FaShoppingBag,
-  FaChartLine,
-  FaEllipsisV,
-  FaSearch,
-  FaSortUp,
-  FaSortDown,
-} from 'react-icons/fa';
-import { useState } from 'react';
-
-const categoryIcons = {
-  Grocery: FaShoppingCart,
-  Restaurant: FaUtensils,
-  Salary: FaBriefcase,
-  Freelance: FaMoneyBillWave,
-  Shopping: FaShoppingBag,
-  Investment: FaChartLine,
-};
+import { FaSearch, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { getTransactionsByClientId } from '../api/api'; // Assuming API file is in the same directory
 
 const TransactionRow = ({ transaction }) => {
-  const IconComponent = categoryIcons[transaction.category] || FaMoneyBillWave;
+  const isIncome = transaction.amount > 0;
 
   return (
     <Tr _hover={{ bg: 'gray.50' }} cursor="pointer">
-      <Td>
-        <HStack spacing={3}>
-          <Box
-            p={2}
-            borderRadius="lg"
-            bg={transaction.type === 'income' ? 'green.100' : 'red.100'}
-            color={transaction.type === 'income' ? 'green.500' : 'red.500'}
-          >
-            <IconComponent />
-          </Box>
-          <VStack align="start" spacing={0}>
-            <Text fontWeight="medium">{transaction.description}</Text>
-            <Text fontSize="sm" color="gray.500">{transaction.category}</Text>
-          </VStack>
-        </HStack>
-      </Td>
-      <Td>{new Date(transaction.date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      })}</Td>
-      <Td isNumeric fontWeight="medium" color={transaction.type === 'income' ? 'green.500' : 'red.500'}>
-        {transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
+      <Td>{transaction.description}</Td>
+      <Td>{new Date(transaction.date).toLocaleDateString()}</Td>
+      <Td isNumeric fontWeight="medium" color={isIncome ? 'green.500' : 'red.500'}>
+        {isIncome ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
       </Td>
       <Td>
         <Badge
-          colorScheme={transaction.type === 'income' ? 'green' : 'red'}
+          colorScheme={isIncome ? 'green' : 'red'}
           px={2}
           py={1}
           borderRadius="full"
           textTransform="capitalize"
         >
-          {transaction.type}
+          {isIncome ? 'Income' : 'Expense'}
         </Badge>
-      </Td>
-      <Td>
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            icon={<FaEllipsisV />}
-            variant="ghost"
-            size="sm"
-          />
-          <MenuList>
-            <MenuItem>View Details</MenuItem>
-            <MenuItem>Download Receipt</MenuItem>
-            <MenuItem>Report Issue</MenuItem>
-          </MenuList>
-        </Menu>
       </Td>
     </Tr>
   );
 };
 
 function Transactions() {
+  const [transactions, setTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [clientId, setClientId] = useState(2); // Example client ID, replace with dynamic logic
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
 
-  const transactions = [
-    { id: 1, date: '2024-03-10', description: 'Grocery Store', amount: 120.50, type: 'expense', category: 'Grocery' },
-    { id: 2, date: '2024-03-09', description: 'Monthly Salary', amount: 3000.00, type: 'income', category: 'Salary' },
-    { id: 3, date: '2024-03-08', description: 'Restaurant Dinner', amount: 45.80, type: 'expense', category: 'Restaurant' },
-    { id: 4, date: '2024-03-07', description: 'Freelance Project', amount: 850.00, type: 'income', category: 'Freelance' },
-    { id: 5, date: '2024-03-06', description: 'Online Shopping', amount: 89.99, type: 'expense', category: 'Shopping' },
-    { id: 6, date: '2024-03-05', description: 'Stock Dividends', amount: 420.00, type: 'income', category: 'Investment' },
-  ];
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const fetchedTransactions = await getTransactionsByClientId(clientId);
+        setTransactions(fetchedTransactions);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+    };
 
-  const netIncome = transactions
-    .filter(transaction => transaction.type === 'income')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    fetchTransactions();
+  }, [clientId]);
 
-  const netExpenses = transactions
-    .filter(transaction => transaction.type === 'expense')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const handleSort = (key) => {
+    setSortConfig((prevState) => {
+      if (prevState.key === key) {
+        return {
+          key,
+          direction: prevState.direction === 'asc' ? 'desc' : 'asc',
+        };
+      }
+      return { key, direction: 'asc' };
+    });
+  };
 
-  const netBalance = netIncome - netExpenses;
-
+  // Sorting logic
   const sortedTransactions = [...transactions].sort((a, b) => {
     if (sortConfig.key) {
       const aValue = a[sortConfig.key];
@@ -148,22 +94,17 @@ function Transactions() {
   });
 
   const filteredTransactions = sortedTransactions.filter((transaction) =>
-    transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.type.toLowerCase().includes(searchTerm.toLowerCase())
+    transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSort = (key) => {
-    setSortConfig((prevState) => {
-      if (prevState.key === key) {
-        return {
-          key,
-          direction: prevState.direction === 'asc' ? 'desc' : 'asc',
-        };
-      }
-      return { key, direction: 'asc' };
-    });
-  };
+  // Calculate total income and expenses
+  const incomeTotal = transactions
+    .filter((transaction) => transaction.amount > 0)
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  const expensesTotal = transactions
+    .filter((transaction) => transaction.amount < 0)
+    .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
 
   return (
     <Box p={8} bg="gray.50" minH="100vh">
@@ -179,39 +120,43 @@ function Transactions() {
           </HStack>
         </Flex>
 
-        {/* Stats Cards */}
-        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm">
-            <Stat>
-              <StatLabel color="gray.500">Net Balance</StatLabel>
-              <StatNumber fontSize="2xl" color={netBalance >= 0 ? "green.500" : "red.500"}>
-                ${netBalance.toFixed(2)}
-              </StatNumber>
-              <StatHelpText>
-                <StatArrow type={netBalance >= 0 ? "increase" : "decrease"} />
-                {((netBalance / netIncome) * 100).toFixed(1)}% of income
-              </StatHelpText>
-            </Stat>
+        {/* Display Income and Expenses in Separate Boxes */}
+        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+          <Box
+            bg="green.100"
+            p={6}
+            borderRadius="lg"
+            shadow="sm"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <VStack align="start">
+              <Heading size="sm" color="green.500">
+                Total Income
+              </Heading>
+              <Text color="green.700" fontSize="lg">
+                ${incomeTotal.toFixed(2)}
+              </Text>
+            </VStack>
           </Box>
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm">
-            <Stat>
-              <StatLabel color="gray.500">Total Income</StatLabel>
-              <StatNumber fontSize="2xl" color="green.500">${netIncome.toFixed(2)}</StatNumber>
-              <StatHelpText>
-                <StatArrow type="increase" />
-                23.36% from last month
-              </StatHelpText>
-            </Stat>
-          </Box>
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm">
-            <Stat>
-              <StatLabel color="gray.500">Total Expenses</StatLabel>
-              <StatNumber fontSize="2xl" color="red.500">${netExpenses.toFixed(2)}</StatNumber>
-              <StatHelpText>
-                <StatArrow type="decrease" />
-                12.45% from last month
-              </StatHelpText>
-            </Stat>
+          <Box
+            bg="red.100"
+            p={6}
+            borderRadius="lg"
+            shadow="sm"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <VStack align="start">
+              <Heading size="sm" color="red.500">
+                Total Expenses
+              </Heading>
+              <Text color="red.700" fontSize="lg">
+                ${expensesTotal.toFixed(2)}
+              </Text>
+            </VStack>
           </Box>
         </Grid>
 
@@ -242,7 +187,6 @@ function Transactions() {
                 <Th cursor="pointer" onClick={() => handleSort('type')}>
                   Status {sortConfig.key === 'type' && (sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                 </Th>
-                <Th></Th>
               </Tr>
             </Thead>
             <Tbody>

@@ -1,7 +1,7 @@
 import { Grid, GridItem, Flex, Image, Box, Button, Text, Link } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { FaSignInAlt, FaRocket } from 'react-icons/fa';
-
+import { Link as RouterLink } from 'react-router-dom';
 const Navbar = () => {
   // State to track the active link
   const [activeLink, setActiveLink] = useState('home');
@@ -137,8 +137,8 @@ const Navbar = () => {
             Get Started
           </Button>
           <Button
-            as={Link}
-            to="/overview"
+            as={RouterLink}
+            to="/login"
             size="lg"
             variant="outline"
             borderColor="black"
