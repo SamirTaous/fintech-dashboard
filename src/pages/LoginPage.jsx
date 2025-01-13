@@ -18,11 +18,12 @@ import {
   IconButton
 } from '@chakra-ui/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import React Icons
-import { users } from '../components/data/users';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { login } from '../api/api'; // Import the login function from the API
+import axios from 'axios'; // Import Axios for API calls
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(''); // Changed email to username
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -32,7 +33,7 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
+    if (!username) newErrors.username = 'Username is required'; // Changed email to username
     if (!password) newErrors.password = 'Password is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -43,11 +44,14 @@ export default function LoginPage() {
     if (!validateForm()) return;
     setIsLoading(true);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const user = users.find((u) => u.email === email && u.password === password);
+    try {
+      // Call the login API
+      const { token } = await login(username, password);
 
-    if (user) {
+      // Save the token in localStorage (or cookies for better security)
+      localStorage.setItem('authToken', token);
+      console.log(token);
+
       // Show success toast
       toast({
         title: 'Login successful',
@@ -58,13 +62,13 @@ export default function LoginPage() {
 
       // Delay navigation to allow toast to be visible
       setTimeout(() => {
-        navigate('/overview');
+        navigate('/overview'); // Navigate to the next page
       }, 2000); // Navigate after 2 seconds
-    } else {
+    } catch (error) {
       // Show error toast
       toast({
         title: 'Invalid credentials',
-        description: 'Please check your email and password',
+        description: 'Please check your username and password',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -114,14 +118,15 @@ export default function LoginPage() {
             textAlign="center"
           >
             <Text
-            fontFamily='Poppins'
-            fontWeight='semibold'
+              fontFamily="Poppins"
+              fontWeight="semibold"
             >
-                Welcome to Modern Banking</Text>
+              Welcome to Modern Banking
+            </Text>
           </Heading>
           <Text
-            fontFamily='Poppins'
-            fontWeight='semibold'
+            fontFamily="Poppins"
+            fontWeight="semibold"
             color="whiteAlpha.900"
             fontSize="25px"
             textAlign="center"
@@ -143,19 +148,19 @@ export default function LoginPage() {
           <VStack spacing={8} align="stretch">
             <form onSubmit={handleSubmit}>
               <VStack spacing={6}>
-                <FormControl isInvalid={errors.email}>
+                <FormControl isInvalid={errors.username}>
                   <FormLabel
                     fontSize="sm"
                     fontWeight="500"
                     color="gray.700"
                   >
-                    Email Address
+                    Username
                   </FormLabel>
                   <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your username"
                     size="lg"
                     fontSize="md"
                     borderRadius="xl"
@@ -165,7 +170,7 @@ export default function LoginPage() {
                       boxShadow: "0 0 0 1px #9747FF",
                     }}
                   />
-                  <FormErrorMessage>{errors.email}</FormErrorMessage>
+                  <FormErrorMessage>{errors.username}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={errors.password}>

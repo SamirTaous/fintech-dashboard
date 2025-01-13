@@ -1,10 +1,9 @@
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
   VStack,
-  HStack,
   Heading,
-  Text,
   Table,
   Thead,
   Tbody,
@@ -13,17 +12,6 @@ import {
   Td,
   Progress,
   Badge,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  IconButton,
-  Flex,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  Grid,
   useDisclosure,
   Modal,
   ModalOverlay,
@@ -31,238 +19,106 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  NumberInput,
+  NumberInputField,
+  FormHelperText,
 } from '@chakra-ui/react';
-import {
-  FaEllipsisV,
-  FaFileInvoiceDollar,
-  FaCalendarAlt,
-  FaChartLine,
-  FaInfoCircle,
-} from 'react-icons/fa';
-
-const LoanCard = ({ title, amount, rate, monthlyPayment }) => (
-  <Box p={6} bg="white" borderRadius="xl" shadow="sm">
-    <VStack align="stretch" spacing={4}>
-      <HStack justify="space-between">
-        <Text color="gray.500" fontSize="sm">{title}</Text>
-        <FaFileInvoiceDollar size={20} color="var(--chakra-colors-purple-500)" />
-      </HStack>
-      <Stat>
-        <StatNumber fontSize="2xl" color="gray.800">${amount.toLocaleString()}</StatNumber>
-        <StatHelpText fontSize="sm" color="gray.500">
-          {rate}% APR
-        </StatHelpText>
-      </Stat>
-      <HStack justify="space-between">
-        <Text fontSize="sm" color="gray.600">Monthly Payment</Text>
-        <Text fontSize="sm" fontWeight="bold" color="gray.800">
-          ${monthlyPayment.toLocaleString()}
-        </Text>
-      </HStack>
-    </VStack>
-  </Box>
-);
-
-const LoanDetailsModal = ({ isOpen, onClose, loan }) => (
-  <Modal isOpen={isOpen} onClose={onClose} size="xl">
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>Loan Details</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody pb={6}>
-        <VStack spacing={4} align="stretch">
-          <Box p={4} bg="gray.50" borderRadius="md">
-            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-              <Stat>
-                <StatLabel>Principal Amount</StatLabel>
-                <StatNumber>${loan.amount.toLocaleString()}</StatNumber>
-              </Stat>
-              <Stat>
-                <StatLabel>Interest Rate</StatLabel>
-                <StatNumber>{loan.rate}%</StatNumber>
-              </Stat>
-              <Stat>
-                <StatLabel>Term Length</StatLabel>
-                <StatNumber>{loan.term} months</StatNumber>
-              </Stat>
-              <Stat>
-                <StatLabel>Monthly Payment</StatLabel>
-                <StatNumber>${loan.monthlyPayment.toLocaleString()}</StatNumber>
-              </Stat>
-            </Grid>
-          </Box>
-          
-          <Box>
-            <Text fontWeight="medium" mb={2}>Payment Schedule</Text>
-            <Table size="sm">
-              <Thead>
-                <Tr>
-                  <Th>Date</Th>
-                  <Th>Principal</Th>
-                  <Th>Interest</Th>
-                  <Th>Total</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {loan.schedule.map((payment, idx) => (
-                  <Tr key={idx}>
-                    <Td>{payment.date}</Td>
-                    <Td>${payment.principal}</Td>
-                    <Td>${payment.interest}</Td>
-                    <Td>${payment.total}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Box>
-        </VStack>
-      </ModalBody>
-    </ModalContent>
-  </Modal>
-);
+import { FaFileInvoiceDollar } from 'react-icons/fa';
+import { createLoanApplication, fetchLoanApplications } from '../api/api'; // Adjust the path as needed
 
 function Loans() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [loanApplications, setLoanApplications] = useState([]);
+  const [formData, setFormData] = useState({
+    personAge: '',
+    personGender: '',
+    personEducation: '',
+    personIncome: '',
+    personEmpExp: '',
+    personHomeOwnership: '',
+    loanAmount: '',
+    loanIntent: '',
+    previousLoanDefaultsOnFile: '',
   
-  const loans = [
-    {
-      type: 'Personal Loan',
-      amount: 15000,
-      remaining: 10000,
-      rate: 8.5,
-      nextPayment: '2024-04-01',
-      term: 36,
-      monthlyPayment: 450,
-      status: 'active',
-      schedule: [
-        { date: '2024-04-01', principal: 380, interest: 70, total: 450 },
-        { date: '2024-05-01', principal: 385, interest: 65, total: 450 },
-        { date: '2024-06-01', principal: 390, interest: 60, total: 450 },
-      ]
-    },
-    {
-      type: 'Car Loan',
-      amount: 25000,
-      remaining: 18000,
-      rate: 6.2,
-      nextPayment: '2024-03-25',
-      term: 60,
-      monthlyPayment: 485,
-      status: 'active',
-      schedule: [
-        { date: '2024-03-25', principal: 410, interest: 75, total: 485 },
-        { date: '2024-04-25', principal: 415, interest: 70, total: 485 },
-        { date: '2024-05-25', principal: 420, interest: 65, total: 485 },
-      ]
-    },
-    {
-      type: 'Home Loan',
-      amount: 250000,
-      remaining: 220000,
-      rate: 4.5,
-      nextPayment: '2024-04-05',
-      term: 360,
-      monthlyPayment: 1267,
-      status: 'active',
-      schedule: [
-        { date: '2024-04-05', principal: 825, interest: 442, total: 1267 },
-        { date: '2024-05-05', principal: 830, interest: 437, total: 1267 },
-        { date: '2024-06-05', principal: 835, interest: 432, total: 1267 },
-      ]
+    // Default values
+    loanIntRate: 8.5,
+    loanPercentIncome: 15.5,
+    cbPersonCredHistLength: 10,
+    creditScore: 720,
+    status: 'PENDING',
+    predictionResult: '',
+    applicationDate: new Date().toISOString().split('T')[0], // Format: YYYY-MM-DD
+  });
+  
+
+  // Fetch loan applications when the page loads
+  useEffect(() => {
+    const loadLoans = async () => {
+      const userId = 1; // Replace with actual user ID
+      try {
+        const loans = await fetchLoanApplications(userId);
+        setLoanApplications(loans);
+      } catch (error) {
+        console.error('Error fetching loan applications:', error);
+      }
+    };
+    loadLoans();
+  }, []);
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userId = 1; // Replace with actual user ID
+      const newLoan = await createLoanApplication({
+        ...formData,
+        userId,
+      });
+      setLoanApplications([...loanApplications, newLoan]);
+      onClose(); // Close the modal after successful submission
+    } catch (error) {
+      console.error('Error creating loan application:', error);
     }
-  ];
+  };
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
     <Box p={8} bg="gray.50" minH="100vh">
       <VStack spacing={8} align="stretch">
         {/* Header */}
-        <Flex justify="space-between" align="center">
-          <VStack align="start" spacing={1}>
-            <Heading size="lg">Loans</Heading>
-            <Text color="gray.600">Manage your active loans and payments</Text>
-          </VStack>
-          <Button colorScheme="purple" leftIcon={<FaFileInvoiceDollar />}>
-            Apply for Loan
-          </Button>
-        </Flex>
+        <Heading size="lg">Loan Applications</Heading>
+        <Button colorScheme="purple" onClick={onOpen} leftIcon={<FaFileInvoiceDollar />}>
+          Apply for Loan
+        </Button>
 
-        {/* Loan Summary Cards */}
-        <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={6}>
-          {loans.map((loan) => (
-            <LoanCard
-              key={loan.type}
-              title={loan.type}
-              amount={loan.amount}
-              rate={loan.rate}
-              monthlyPayment={loan.monthlyPayment}
-            />
-          ))}
-        </Grid>
-
-        {/* Active Loans Table */}
+        {/* Loan Applications Table */}
         <Box bg="white" borderRadius="xl" shadow="sm" overflow="hidden">
           <Table>
             <Thead bg="gray.50">
               <Tr>
-                <Th>Loan Type</Th>
-                <Th isNumeric>Amount</Th>
-                <Th>Progress</Th>
-                <Th isNumeric>Interest Rate</Th>
-                <Th>Next Payment</Th>
+                <Th>Loan Amount</Th>
+                <Th>Purpose</Th>
+                <Th>Interest Rate</Th>
                 <Th>Status</Th>
-                <Th></Th>
               </Tr>
             </Thead>
             <Tbody>
-              {loans.map((loan) => (
-                <Tr key={loan.type}>
-                  <Td fontWeight="medium">{loan.type}</Td>
-                  <Td isNumeric>${loan.amount.toLocaleString()}</Td>
+              {loanApplications.map((loan) => (
+                <Tr key={loan.id}>
+                  <Td>${loan.loanAmount.toLocaleString()}</Td>
+                  <Td>{loan.loanIntent}</Td>
+                  <Td>{loan.loanIntRate || 'TBD'}%</Td>
                   <Td>
-                    <VStack align="stretch" spacing={1}>
-                      <Progress
-                        value={((loan.amount - loan.remaining) / loan.amount) * 100}
-                        size="sm"
-                        colorScheme="purple"
-                        borderRadius="full"
-                      />
-                      <Text fontSize="xs" color="gray.500">
-                        ${loan.remaining.toLocaleString()} remaining
-                      </Text>
-                    </VStack>
-                  </Td>
-                  <Td isNumeric>{loan.rate}%</Td>
-                  <Td>
-                    <HStack>
-                      <FaCalendarAlt size={14} color="var(--chakra-colors-gray-400)" />
-                      <Text>{new Date(loan.nextPayment).toLocaleDateString()}</Text>
-                    </HStack>
-                  </Td>
-                  <Td>
-                    <Badge colorScheme="green" textTransform="capitalize">
-                      {loan.status}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <Menu>
-                      <MenuButton
-                        as={IconButton}
-                        icon={<FaEllipsisV />}
-                        variant="ghost"
-                        size="sm"
-                      />
-                      <MenuList>
-                        <MenuItem icon={<FaInfoCircle />} onClick={onOpen}>
-                          View Details
-                        </MenuItem>
-                        <MenuItem icon={<FaFileInvoiceDollar />}>
-                          Make Payment
-                        </MenuItem>
-                        <MenuItem icon={<FaChartLine />}>
-                          View Statement
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
+                    <Badge colorScheme="orange">{loan.status || 'Pending'}</Badge>
                   </Td>
                 </Tr>
               ))}
@@ -271,11 +127,101 @@ function Loans() {
         </Box>
       </VStack>
 
-      <LoanDetailsModal
-        isOpen={isOpen}
-        onClose={onClose}
-        loan={loans[0]} // Pass the selected loan
-      />
+      {/* Loan Application Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Apply for Loan</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={4}>
+                <FormControl isRequired>
+                  <FormLabel>Age</FormLabel>
+                  <NumberInput min={18}>
+                    <NumberInputField name="personAge" value={formData.personAge} onChange={handleChange} />
+                  </NumberInput>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Gender</FormLabel>
+                  <Select name="personGender" value={formData.personGender} onChange={handleChange}>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </Select>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Education</FormLabel>
+                  <Select name="personEducation" value={formData.personEducation} onChange={handleChange}>
+                    <option value="">Select Education</option>
+                    <option value="High School">High School</option>
+                    <option value="Associate">Associate</option>
+                    <option value="Bachelor">Bachelor</option>
+                    <option value="Master">Master</option>
+                    <option value="Doctorate">Doctorate</option>
+                  </Select>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Home Ownership</FormLabel>
+                  <Select name="personHomeOwnership" value={formData.personHomeOwnership} onChange={handleChange}>
+                    <option value="">Select Ownership</option>
+                    <option value="Own">Own</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Mortgage">Mortgage</option>
+                    <option value="Others">Others</option>
+                  </Select>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Annual Income</FormLabel>
+                  <NumberInput min={0}>
+                    <NumberInputField name="personIncome" value={formData.personIncome} onChange={handleChange} />
+                  </NumberInput>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Employment Experience (Years)</FormLabel>
+                  <NumberInput min={0} max={40}>
+                    <NumberInputField name="personEmpExp" value={formData.personEmpExp} onChange={handleChange} />
+                  </NumberInput>
+                </FormControl>
+                {/* Additional fields */}
+                <FormControl isRequired>
+                <FormLabel>Previous Loan Defaults</FormLabel>
+                <Select
+                  name="previousLoanDefaultsOnFile"
+                  value={formData.previousLoanDefaultsOnFile}
+                  onChange={handleChange}
+                >
+                  <option value="">Select an Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </Select>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Loan Amount</FormLabel>
+                  <NumberInput min={0}>
+                    <NumberInputField name="loanAmount" value={formData.loanAmount} onChange={handleChange} />
+                  </NumberInput>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Loan Purpose</FormLabel>
+                  <Select name="loanIntent" value={formData.loanIntent} onChange={handleChange}>
+                    <option value="">Select Purpose</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Debt Consolidation">Debt Consolidation</option>
+                    <option value="Education">Education</option>
+                    <option value="Medical">Medical</option>
+                    <option value="Venture">Venture</option>
+                    <option value="Home Improvement">Home Improvement</option>
+                  </Select>
+                </FormControl>
+              </VStack>
+              <Button mt={4} colorScheme="purple" type="submit">
+                Submit
+              </Button>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }

@@ -20,6 +20,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { FaSearch, FaSortUp, FaSortDown } from 'react-icons/fa';
+import {jwtDecode} from 'jwt-decode'; // Ensure the correct version is installed
 import { getTransactionsByClientId } from '../api/api'; // Assuming API file is in the same directory
 
 const TransactionRow = ({ transaction }) => {
@@ -50,21 +51,35 @@ const TransactionRow = ({ transaction }) => {
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [clientId, setClientId] = useState(2); // Example client ID, replace with dynamic logic
+  const [clientId, setClientId] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
 
   useEffect(() => {
     const fetchTransactions = async () => {
+      const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
       try {
-        const fetchedTransactions = await getTransactionsByClientId(clientId);
-        setTransactions(fetchedTransactions);
+        const decodedToken = jwtDecode(token); // Decode the token
+        const extractedClientId = decodedToken.user_id; // Extract user_id from token
+        setClientId(extractedClientId);
+        console.log(extractedClientId);
+        console.log(decodedToken);
+
+        if (extractedClientId) {
+          const fetchedTransactions = await getTransactionsByClientId(extractedClientId, token);
+          setTransactions(fetchedTransactions);
+        }
       } catch (error) {
-        console.error('Error fetching transactions:', error);
+        console.error('Error decoding token or fetching transactions:', error);
       }
     };
 
     fetchTransactions();
-  }, [clientId]);
+  }, []);
 
   const handleSort = (key) => {
     setSortConfig((prevState) => {
