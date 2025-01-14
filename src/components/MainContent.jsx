@@ -8,6 +8,7 @@ import Rewards from '../pages/Rewards';
 import Loans from '../pages/Loans';
 import Settings from '../pages/Settings';
 import Landing from '../pages/Landing';
+import Accounts from '../pages/Accounts';
 
 function MainContent() {
   return (
@@ -20,6 +21,7 @@ function MainContent() {
       <Route path="/rewards" element={<Rewards />} />
       <Route path="/loans" element={<Loans />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path='/accounts' element={<Accounts/>}> </Route>
     </Routes>
   );
 }

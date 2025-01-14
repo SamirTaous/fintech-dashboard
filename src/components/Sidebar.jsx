@@ -29,10 +29,12 @@ import {
   FiLogOut,
   FiHelpCircle,
 } from 'react-icons/fi';
+import { IoWalletOutline } from "react-icons/io5";
 import { NavLink } from 'react-router-dom';
 
 const menuItems = [
   { icon: FiHome, text: 'Overview', path: '/overview' },
+  { icon: IoWalletOutline, text: 'Accounts', path: '/accounts' },
   { icon: FiDollarSign, text: 'Transactions', path: '/transactions' },
   { icon: FiCreditCard, text: 'Cards', path: '/cards' },
   { icon: FiFileText, text: 'Loans', path: '/loans' },
