@@ -20,19 +20,23 @@ pipeline {
             }
         }
          stage('Prepare Environment Variables') {
-             steps {
-                script {
-                    def envFile = '.env'
-                   if (env.BRANCH_NAME == 'main'){
-                           envFile = '.env-production'
-                    }
-                   sh """
-                        cp ${envFile} .env
-                        cat .env
-                   """
-                }
+    steps {
+        script {
+            def envFile = '.env'
+           if (env.BRANCH_NAME == 'main'){
+                   envFile = '.env-production'
             }
-        }
+           sh """
+              if [ "${envFile}" = ".env-production" ]; then
+                  cp .env-production .env
+              else
+                 cp .env .env
+              fi
+               cat .env
+           """
+       }
+     }
+  }
          stage('Install Dependencies') {
             steps {
                 sh 'npm install'
