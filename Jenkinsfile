@@ -27,7 +27,7 @@ pipeline {
                     envFile = '.env-production'
                }
               sh """
-                if [ "$envFile" == ".env-production" ]; then
+                if [ "$envFile" = ".env-production" ]; then
                       cp .env-production .env
                   else
                      cp .env .env
