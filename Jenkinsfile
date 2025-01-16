@@ -20,6 +20,11 @@ pipeline {
                 )
             }
         }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install' // Installe les dépendances du projet
+            }
+        }
        stage('Run Dev Server') {
     steps {
         sh 'npm run dev' // Lancez le serveur de développement
