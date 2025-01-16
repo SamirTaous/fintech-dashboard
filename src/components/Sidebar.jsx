@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   VStack,
@@ -31,6 +32,7 @@ import {
 } from 'react-icons/fi';
 import { IoWalletOutline } from "react-icons/io5";
 import { NavLink } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 
 const menuItems = [
   { icon: FiHome, text: 'Overview', path: '/overview' },
@@ -46,9 +48,22 @@ const bottomMenuItems = [
 ];
 
 function Sidebar({ isOpen, onToggle }) {
+  const [username, setUsername] = useState('');
   const bgColor = useColorModeValue('#392467', '#2D1B50');
   const hoverBgColor = useColorModeValue('#4A307D', '#3D2A6D');
   const activeBgColor = useColorModeValue('#5A3B93', '#4D358D');
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUsername(decodedToken.sub || 'User');
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+  }, []);
 
   return (
     <Flex
@@ -79,13 +94,7 @@ function Sidebar({ isOpen, onToggle }) {
       />
 
       {/* Logo Section */}
-      <Flex
-        p={2}
-        align="center"
-        h="60px"
-        transition="all 0.3s"
-        mb={6}
-      >
+      <Flex p={2} align="center" h="60px" transition="all 0.3s" mb={6}>
         <Icon as={FiCompass} boxSize="30px" color="white" />
         {isOpen && (
           <Text
@@ -136,7 +145,7 @@ function Sidebar({ isOpen, onToggle }) {
                       <Text
                         ml={4}
                         fontSize="sm"
-                        fontWeight={isActive ? "600" : "normal"}
+                        fontWeight={isActive ? '600' : 'normal'}
                       >
                         {item.text}
                       </Text>
@@ -185,7 +194,7 @@ function Sidebar({ isOpen, onToggle }) {
                       <Text
                         ml={4}
                         fontSize="sm"
-                        fontWeight={isActive ? "600" : "normal"}
+                        fontWeight={isActive ? '600' : 'normal'}
                       >
                         {item.text}
                       </Text>
@@ -214,23 +223,13 @@ function Sidebar({ isOpen, onToggle }) {
           <Flex align="center">
             <Avatar
               size="sm"
-              name="John Doe"
-              src="/placeholder-user.jpg"
+              name={username}
+              bg="purple.500"
             />
             {isOpen && (
-              <VStack
-                align="start"
-                spacing={0}
-                ml={3}
-                overflow="hidden"
-              >
-                <Text fontSize="sm" fontWeight="medium">
-                  John Doe
-                </Text>
-                <Text fontSize="xs" color="whiteAlpha.700">
-                  john.doe@example.com
-                </Text>
-              </VStack>
+              <Text fontSize="sm" fontWeight="medium" ml={3}>
+                {username.toLowerCase()}
+              </Text>
             )}
           </Flex>
         </MenuButton>
@@ -247,4 +246,3 @@ function Sidebar({ isOpen, onToggle }) {
 }
 
 export default Sidebar;
-

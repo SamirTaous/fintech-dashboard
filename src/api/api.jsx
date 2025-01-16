@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL1 = 'http://localhost:8081/auth'; // API for authentification
-const API_URL2 = 'http://localhost:8080/api/Operation' // API for transactions
+const API_URL2 = 'http://localhost:8084/api/Operation' // API for transactions
 const API_URL3 = 'http://localhost:8082/api/loan-applications'; // API for loan applications
 const API_URL4 = 'http://localhost:8085/accounts'
 
@@ -15,10 +15,10 @@ export const login = async (username, password) => {
   }
 };
 
-// Fetch transactions by client ID with token
-export const getTransactionsByClientId = async (clientId, token) => {
+// Fetch transactions by compte Id with token
+export const getTransactionsByCompteId = async (compteId, token) => {
   try {
-    const response = await axios.get(`${API_URL2}/operationsClient/${clientId}`, {
+    const response = await axios.get(`${API_URL2}/operations/${compteId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

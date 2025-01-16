@@ -1,173 +1,190 @@
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
   Heading,
   Text,
   Flex,
-  Button,
-  Icon,
-  HStack,
   VStack,
-  Badge,
+  Button,
+  Spinner,
+  useToast,
 } from '@chakra-ui/react';
-import { 
-  FaCreditCard, 
-  FaWifi, 
-  FaLock, 
-  FaEllipsisH,
-  FaPause,
-} from 'react-icons/fa';
-import { SiVisa, SiMastercard } from 'react-icons/si';
+import { motion } from 'framer-motion';
+import { FaCreditCard } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode';
+import { getAccountsbyClientID } from '../api/api';
+import { CardComponent } from '../components/cards/CardComponent';
 
-const CardComponent = ({ 
-  cardNumber, 
-  expiryDate, 
-  balance, 
-  cardType, 
-  holderName, 
-  isLocked, 
-  color 
-}) => {
-  return (
-    <Box
-      bg={`linear-gradient(135deg, ${color[0]}, ${color[1]})`}
-      borderRadius="2xl"
-      p={6}
-      position="relative"
-      overflow="hidden"
-      boxShadow="xl"
-      w="full"
-      h="220px"
-      _before={{
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: 
-          'radial-gradient(circle at 50% -20%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, transparent 80%)',
-      }}
-    >
-      <Flex direction="column" h="full" justify="space-between">
-        <Flex justify="space-between" align="center">
-          <Icon as={FaCreditCard} w={8} h={8} color="white" />
-          <HStack spacing={2}>
-            <Icon as={FaWifi} transform="rotate(90deg)" color="white" />
-            {cardType === 'visa' ? (
-              <Icon as={SiVisa} w={12} h={12} color="white" />
-            ) : (
-              <Icon as={SiMastercard} w={12} h={12} color="white" />
-            )}
-          </HStack>
-        </Flex>
-
-        <Text color="white" fontSize="xl" letterSpacing={8} mt={4}>
-          **** **** **** {cardNumber}
-        </Text>
-
-        <Flex justify="space-between" align="flex-end">
-          <Box>
-            <Text color="whiteAlpha.700" fontSize="xs" mb={1}>
-              Card Holder
-            </Text>
-            <Text color="white" fontSize="sm">
-              {holderName}
-            </Text>
-            <Text color="whiteAlpha.700" fontSize="xs" mt={2}>
-              Expires
-            </Text>
-            <Text color="white" fontSize="sm">
-              {expiryDate}
-            </Text>
-          </Box>
-          <Box textAlign="right">
-            <Text color="whiteAlpha.700" fontSize="xs" mb={1}>
-              Balance
-            </Text>
-            <Text color="white" fontSize="xl" fontWeight="bold">
-              ${balance}
-            </Text>
-          </Box>
-        </Flex>
-      </Flex>
-    </Box>
-  );
-};
+const MotionBox = motion(Box);
 
 function Cards() {
-  const cards = [
-    {
-      cardNumber: '4589',
-      expiryDate: '12/25',
-      balance: '4,850.75',
-      cardType: 'visa',
-      holderName: 'JOHN DOE',
-      isLocked: false,
-      color: ['#0ea5e9', '#2563eb']
-    },
-    {
-      cardNumber: '1234',
-      expiryDate: '09/26',
-      balance: '2,340.50',
-      cardType: 'mastercard',
-      holderName: 'JOHN DOE',
-      isLocked: true,
-      color: ['#a855f7', '#6366f1']
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState('');
+  const toast = useToast();
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      try {
+        const decodedToken = jwtDecode(token);
+        const clientId = decodedToken.user_id;
+        const fetchedUsername = decodedToken.sub;
+        setUsername(fetchedUsername);
+
+        const fetchedAccounts = await getAccountsbyClientID(clientId, token);
+
+        const cardData = fetchedAccounts.map((account) => ({
+          id: account.id_account,
+          cardNumber: account.cardNumber || '****',
+          expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5))
+            .toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }),
+          balance: account.balance.toFixed(2),
+          cardType: account.accountType.toLowerCase() === 'gold' ? 'visa' : 'mastercard',
+          holderName: fetchedUsername || 'UNKNOWN',
+          isLocked: account.isLocked,
+          isFrozen: false,
+          color:
+            account.accountType.toLowerCase() === 'gold'
+              ? ['#ffd700', '#ffa500']
+              : account.accountType.toLowerCase() === 'silver'
+              ? ['#c0c0c0', '#808080']
+              : ['#0ea5e9', '#2563eb'],
+        }));
+
+        setCards(cardData);
+      } catch (error) {
+        console.error('Error fetching accounts:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch card data. Please try again later.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, [toast]);
+
+  const toggleLock = async (id) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setCards((prevCards) =>
+        prevCards.map((card) =>
+          card.id === id ? { ...card, isLocked: !card.isLocked } : card
+        )
+      );
+
+      toast({
+        title: 'Card Updated',
+        description: `Card has been ${
+          cards.find((c) => c.id === id).isLocked ? 'unlocked' : 'locked'
+        }.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update card status. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
-  ];
+  };
+
+  const toggleFreeze = async (id) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setCards((prevCards) =>
+        prevCards.map((card) =>
+          card.id === id ? { ...card, isFrozen: !card.isFrozen } : card
+        )
+      );
+
+      toast({
+        title: 'Card Updated',
+        description: `Card has been ${
+          cards.find((c) => c.id === id).isFrozen ? 'unfrozen' : 'frozen'
+        }.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update card status. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" minH="100vh">
+        <Spinner size="xl" color="purple.500" />
+      </Flex>
+    );
+  }
 
   return (
     <Box p={8} bg="gray.50" minH="100vh">
-      <VStack spacing={6} align="stretch">
-        <Flex justify="space-between" align="center">
-          <Heading size="lg" color="gray.800">Your Cards</Heading>
-          <Button colorScheme="purple" size="sm">Add New Card</Button>
-        </Flex>
-
-        <Grid
-          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-          gap={6}
+      <VStack spacing={8} align="stretch">
+        {/* Title Section with Motion */}
+        <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          {cards.map((card, index) => (
-            <Box key={index}>
-              <CardComponent {...card} />
-              <Flex mt={4} justify="space-between" align="center">
-                <HStack spacing={4}>
-                  <Button
-                    size="sm"
-                    leftIcon={<FaLock />}
-                    variant="ghost"
-                    colorScheme={card.isLocked ? "red" : "gray"}
-                  >
-                    {card.isLocked ? "Unlock" : "Lock"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    leftIcon={<FaPause />}
-                    variant="ghost"
-                  >
-                    Freeze
-                  </Button>
-                </HStack>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  colorScheme="gray"
-                  rightIcon={<FaEllipsisH />}
-                >
-                  Details
-                </Button>
-              </Flex>
-              <Flex mt={4} justify="space-between" align="center">
-                <Badge colorScheme={card.isLocked ? "red" : "green"}>
-                  {card.isLocked ? "Locked" : "Active"}
-                </Badge>
-                <Text fontSize="sm" color="gray.600">
-                  Daily Limit: $10,000
-                </Text>
-              </Flex>
-            </Box>
+          <Flex justify="space-between" align="center">
+            <VStack align="start" spacing={1}>
+              <Heading size="xl" bgGradient="linear(to-r, purple.500, pink.500)" bgClip="text">
+                Your Cards
+              </Heading>
+              <Text color="gray.600">Manage and control your cards</Text>
+            </VStack>
+            <Button
+              colorScheme="purple"
+              size="md"
+              leftIcon={<FaCreditCard />}
+              _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
+              transition="all 0.2s"
+            >
+              Add New Card
+            </Button>
+          </Flex>
+        </MotionBox>
+
+        {/* Cards List Section */}
+        <Grid
+          templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+          gap={8}
+          alignItems="start"
+        >
+          {cards.map((card) => (
+            <CardComponent
+              key={card.id}
+              card={card}
+              onLockToggle={() => toggleLock(card.id)}
+              onFreezeToggle={() => toggleFreeze(card.id)}
+            />
           ))}
         </Grid>
       </VStack>
@@ -176,4 +193,3 @@ function Cards() {
 }
 
 export default Cards;
-
