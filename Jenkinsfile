@@ -1,9 +1,9 @@
 pipeline {
     agent any
     tools {
-        node 'Node'
-        dockerTool 'Docker'
-    }
+    nodejs 'Node' 
+    dockerTool 'Docker'
+}
    /* environment {
         AWS_REGION = 'eu-west-3'
         ECR_REGISTRY = '329599629502.dkr.ecr.eu-west-3.amazonaws.com'
