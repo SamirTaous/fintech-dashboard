@@ -1,6 +1,8 @@
 # Étape 1 : Utiliser une image Node.js comme base
 FROM node:18-alpine AS builder
 
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 # Étape 2 : Définir le répertoire de travail dans le conteneur
 WORKDIR /app
 
