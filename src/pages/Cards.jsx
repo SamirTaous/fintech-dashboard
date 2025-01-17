@@ -160,7 +160,7 @@ function Cards() {
               </Heading>
               <Text color="gray.600">Manage and control your cards</Text>
             </VStack>
-            <Button
+            {/* <Button
               colorScheme="purple"
               size="md"
               leftIcon={<FaCreditCard />}
@@ -168,15 +168,16 @@ function Cards() {
               transition="all 0.2s"
             >
               Add New Card
-            </Button>
+            </Button> */}
           </Flex>
-        </MotionBox>
+        
 
         {/* Cards List Section */}
         <Grid
           templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
           gap={8}
           alignItems="start"
+          mt={4}
         >
           {cards.map((card) => (
             <CardComponent
@@ -187,6 +188,7 @@ function Cards() {
             />
           ))}
         </Grid>
+        </MotionBox>
       </VStack>
     </Box>
   );

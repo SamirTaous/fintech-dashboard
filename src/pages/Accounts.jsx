@@ -79,7 +79,7 @@ function Accounts() {
   };
 
   return (
-    <Box p={6} bg="gray.50" minH="100vh">
+    <Box p={8} bg="gray.50" minH="100vh">
       <VStack spacing={6} align="stretch">
         {/* Header Section */}
         <MotionBox
@@ -107,17 +107,17 @@ function Accounts() {
               <Button leftIcon={<FaChartPie />} variant="outline" colorScheme="purple">
                 Export
               </Button>
-              <Button colorScheme="purple" leftIcon={<Icon as={FaCoins} />}>
+              {/* <Button colorScheme="purple" leftIcon={<Icon as={FaCoins} />}>
                 Add Account
-              </Button>
+              </Button> */}
             </HStack>
           </Grid>
 
           {/* Accounts Summary Positioned Here */}
-          <Box mt={4}>
+          <Box mt={4} mb={4}>
             <AccountsSummary accounts={accounts} />
           </Box>
-        </MotionBox>
+        
 
         {/* Charts Section */}
         <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4}>
@@ -126,7 +126,7 @@ function Accounts() {
         </Grid>
 
         {/* Accounts List Section */}
-        <Grid templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
+        <Grid mt={5} templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
           {accounts.map((account) => (
             <MotionBox
               key={account.id_account}
@@ -141,6 +141,7 @@ function Accounts() {
             </MotionBox>
           ))}
         </Grid>
+        </MotionBox>
       </VStack>
     </Box>
   );

@@ -25,27 +25,18 @@ import {
   FaCreditCard,
   FaPlus,
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { FaSackDollar } from 'react-icons/fa6';
 import { AiFillDollarCircle } from 'react-icons/ai';
 import { BsCashStack } from 'react-icons/bs';
-import StatCard from '../components/stats/StatCard';
 import OverviewChart from '../components/charts/OverviewChart';
-import QuickActions from '../components/quick-actions/QuickActions';
 import RecentTransactions from '../components/transactions/RecentTransactions';
 import { Link } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { getAccountsbyClientID } from '../api/api';
+import { getAccountsbyClientID, getTransactionsByCompteId } from '../api/api';
 
-const chartData = [
-  { name: 'Jan', amount: 2300, expenses: 1800 },
-  { name: 'Feb', amount: 3000, expenses: 2200 },
-  { name: 'Mar', amount: 5000, expenses: 3100 },
-  { name: 'Apr', amount: 4500, expenses: 2800 },
-  { name: 'May', amount: 6000, expenses: 3500 },
-  { name: 'Jun', amount: 5500, expenses: 3200 },
-];
+const MotionBox = motion(Box);
 
 const QuickAction = ({ icon: Icon, label, onClick }) => (
   <Button
@@ -78,9 +69,12 @@ function Overview() {
   const [totalBalance, setTotalBalance] = useState(null);
   const [accountCount, setAccountCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    const fetchAccounts = async () => {
+    const fetchAccountsAndTransactions = async () => {
       try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -93,35 +87,88 @@ function Overview() {
           throw new Error('Invalid token: clientId not found');
         }
 
-        const response = await getAccountsbyClientID(clientId, token);
-        console.log(response);
-        console.log(response.data);
-        const accounts = response;
+        // Fetch accounts
+        const accounts = await getAccountsbyClientID(clientId, token);
         const balance = accounts.reduce((sum, account) => sum + account.balance, 0);
-
         setTotalBalance(balance);
         setAccountCount(accounts.length);
+
+        // Fetch transactions for each account
+        const allTransactions = [];
+        for (const account of accounts) {
+          const accountTransactions = await getTransactionsByCompteId(account.id_account, token);
+          allTransactions.push(...accountTransactions);
+        }
+
+        setTransactions(allTransactions);
+
+        // Calculate totals
+        const income = allTransactions
+          .filter(transaction => transaction.amount > 0)
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        const expenses = allTransactions
+          .filter(transaction => transaction.amount < 0)
+          .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+
+        setTotalIncome(income);
+        setTotalExpenses(expenses);
+
       } catch (error) {
-        console.error('Error fetching accounts:', error);
+        console.error('Error fetching accounts and transactions:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAccounts();
+    fetchAccountsAndTransactions();
   }, []);
+
+  // Calculate month-over-month changes
+  const calculateMonthlyChange = (currentAmount, transactions) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    
+    const thisMonthTransactions = transactions.filter(
+      t => new Date(t.date).getMonth() === currentMonth
+    );
+    const lastMonthTransactions = transactions.filter(
+      t => new Date(t.date).getMonth() === lastMonth
+    );
+
+    const thisMonthTotal = thisMonthTransactions.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
+    const lastMonthTotal = lastMonthTransactions.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
+
+    if (lastMonthTotal === 0) return 0;
+    return ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
+  };
+
+  const incomeChange = calculateMonthlyChange(totalIncome, transactions.filter(t => t.amount > 0));
+  const expensesChange = calculateMonthlyChange(totalExpenses, transactions.filter(t => t.amount < 0));
 
   return (
     <Box p={8} bg="gray.50" minHeight="100vh">
       {/* Header Section */}
+      <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
       <Flex direction="row" justify="space-between" align="center" mb={8}>
         <VStack align="start" spacing={1}>
-          <Heading size="lg" color="gray.800">
+          <Heading size="xl" bgGradient="linear(to-r, purple.500, pink.500)" bgClip="text">
             Overview
           </Heading>
-          <Text color="gray.600">Welcome back, John Doe</Text>
+          <Text color="gray.600">Get a snapshot of your financial activity </Text>
         </VStack>
-        <HStack spacing={4}>
+        {/* <HStack spacing={4}>
           <Button leftIcon={<FaPlus />} variant="outline" colorScheme="purple">
             Add Money
           </Button>
@@ -135,8 +182,9 @@ function Overview() {
               <MenuItem icon={<FaCreditCard />}>Link New Card</MenuItem>
             </MenuList>
           </Menu>
-        </HStack>
+        </HStack> */}
       </Flex>
+      
 
       {/* Main Grid Section */}
       <Grid templateColumns="repeat(6, 1fr)" templateRows="repeat(4, auto)" gap={6}>
@@ -172,7 +220,9 @@ function Overview() {
                     </Text>
                     <AiFillDollarCircle size={24} />
                   </HStack>
-                  <Heading className="balance-heading">${totalBalance.toFixed(2)}</Heading>
+                  <Heading className="balance-heading">
+                    ${totalBalance?.toFixed(2) || '0.00'}
+                  </Heading>
                   <Text fontSize="sm" opacity={0.8}>
                     Available in {accountCount} account{accountCount !== 1 ? 's' : ''}
                   </Text>
@@ -190,9 +240,9 @@ function Overview() {
                 <FaArrowAltCircleUp />
                 <Text fontSize="sm">Income</Text>
               </HStack>
-              <Heading size="lg">$940</Heading>
+              <Heading size="lg">${totalIncome.toFixed(2)}</Heading>
               <Text fontSize="xs" color="gray.500">
-                +12% from last month
+                {incomeChange > 0 ? '+' : ''}{incomeChange.toFixed(1)}% from last month
               </Text>
             </VStack>
           </Box>
@@ -205,9 +255,9 @@ function Overview() {
                 <FaArrowAltCircleDown />
                 <Text fontSize="sm">Expenses</Text>
               </HStack>
-              <Heading size="lg">$890</Heading>
+              <Heading size="lg">${totalExpenses.toFixed(2)}</Heading>
               <Text fontSize="xs" color="gray.500">
-                -3% from last month
+                {expensesChange > 0 ? '+' : ''}{expensesChange.toFixed(1)}% from last month
               </Text>
             </VStack>
           </Box>
@@ -220,9 +270,9 @@ function Overview() {
                 <FaSackDollar />
                 <Text fontSize="sm">Savings</Text>
               </HStack>
-              <Heading size="lg">$240</Heading>
+              <Heading size="lg">${(totalIncome - totalExpenses).toFixed(2)}</Heading>
               <Text fontSize="xs" color="gray.500">
-                Goal: $1,000
+                Net savings this period
               </Text>
             </VStack>
           </Box>
@@ -242,19 +292,14 @@ function Overview() {
           <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
             <Flex justify="space-between" align="center" mb={6}>
               <VStack align="start" spacing={1}>
-                <Heading size="md">Monthly Overview</Heading>
+                <Heading size="md">Daily Overview</Heading>
                 <Text fontSize="sm" color="gray.500">
                   Income vs Expenses
                 </Text>
               </VStack>
-              <Select size="sm" w="auto" defaultValue="6months">
-                <option value="6months">Last 6 months</option>
-                <option value="3months">Last 3 months</option>
-                <option value="1year">Last year</option>
-              </Select>
             </Flex>
             <Box h="300px">
-              <OverviewChart data={chartData} />
+              <OverviewChart transactions={transactions} />
             </Box>
           </Box>
         </GridItem>
@@ -273,10 +318,11 @@ function Overview() {
                 View All
               </Button>
             </Flex>
-            <RecentTransactions />
+            <RecentTransactions transactions={transactions.slice(0, 6)} />
           </Box>
         </GridItem>
       </Grid>
+      </MotionBox>
     </Box>
   );
 }

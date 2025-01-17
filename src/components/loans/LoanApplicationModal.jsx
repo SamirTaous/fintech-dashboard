@@ -17,7 +17,7 @@ import {
   SimpleGrid,
 } from '@chakra-ui/react';
 
-const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
+const LoanApplicationModal = ({ isOpen, onClose, onSubmit, accounts }) => {
   const [formData, setFormData] = useState({
     personAge: '',
     personGender: '',
@@ -32,11 +32,13 @@ const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
     loanPercentIncome: 15.5,
     cbPersonCredHistLength: 10,
     creditScore: 600,
+    id_account: '', 
     status: 'PENDING',
     predictionResult: '',
     applicationDate: new Date().toISOString().split('T')[0],
   });
 
+  console.log(accounts);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -45,6 +47,7 @@ const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+    console.log(formData);
     setFormData({
       personAge: '',
       personGender: '',
@@ -59,6 +62,7 @@ const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
       loanPercentIncome: 15.5,
       cbPersonCredHistLength: 10,
       creditScore: 600,
+      id_account: '', 
       status: 'PENDING',
       predictionResult: '',
       applicationDate: new Date().toISOString().split('T')[0],
@@ -151,6 +155,20 @@ const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
                   <option value="Home Improvement">Home Improvement</option>
                 </Select>
               </FormControl>
+
+              {/* New Account Selection Dropdown */}
+              <FormControl isRequired>
+                <FormLabel>Select Account</FormLabel>
+                <Select name="id_account" value={formData.id_account} onChange={handleChange}>
+                  <option value="">Select an Account</option>
+                  {accounts.map((account) => (
+                    <option key={account.id_account} value={account.id_account}>
+                      {account.accountNumber} 
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+
             </SimpleGrid>
             <Button mt={8} colorScheme="purple" type="submit" width="full">
               Submit Application
@@ -163,4 +181,3 @@ const LoanApplicationModal = ({ isOpen, onClose, onSubmit }) => {
 };
 
 export default LoanApplicationModal;
-

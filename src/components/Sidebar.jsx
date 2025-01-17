@@ -43,8 +43,7 @@ const menuItems = [
 ];
 
 const bottomMenuItems = [
-  { icon: FiSettings, text: 'Settings', path: '/settings' },
-  { icon: FiHelpCircle, text: 'Help & Support', path: '/support' },
+  { icon: FiSettings, text: 'Settings', path: '/settings' }
 ];
 
 function Sidebar({ isOpen, onToggle }) {
@@ -234,8 +233,6 @@ function Sidebar({ isOpen, onToggle }) {
           </Flex>
         </MenuButton>
         <MenuList>
-          <MenuItem icon={<FiUser />}>Profile</MenuItem>
-          <MenuItem icon={<FiBell />}>Notifications</MenuItem>
           <MenuItem icon={<FiLogOut />} color="red.500">
             Logout
           </MenuItem>

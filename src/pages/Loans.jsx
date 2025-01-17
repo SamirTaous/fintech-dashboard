@@ -11,17 +11,21 @@ import {
   Container,
   SimpleGrid,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { FaFileInvoiceDollar, FaChartLine, FaHistory } from 'react-icons/fa';
-import { jwtDecode } from 'jwt-decode';
-import { createLoanApplication, fetchLoanApplications } from '../api/api';
+import {jwtDecode} from 'jwt-decode';
+import { createLoanApplication, fetchLoanApplications, getAccountsbyClientID } from '../api/api';
 import LoanApplicationModal from '../components/loans/LoanApplicationModal';
 import LoanApplicationsTable from '../components/loans/LoanApplicationsTable';
 import LoanStatistics from '../components/loans/LoanStatistics';
 import LoanHistory from '../components/loans/LoanHistory';
 
+const MotionBox = motion(Box);
+
 function Loans() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loanApplications, setLoanApplications] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [userId, setUserId] = useState(null);
   const toast = useToast();
 
@@ -50,11 +54,15 @@ function Loans() {
         try {
           const loans = await fetchLoanApplications(userId);
           setLoanApplications(loans);
+
+          // Fetch accounts associated with the client
+          const accountsData = await getAccountsbyClientID(userId);
+          setAccounts(accountsData);
         } catch (error) {
-          console.error('Error fetching loan applications:', error);
+          console.error('Error fetching data:', error);
           toast({
             title: 'Error',
-            description: 'Failed to fetch loan applications. Please try again.',
+            description: 'Failed to fetch data. Please try again.',
             status: 'error',
             duration: 5000,
             isClosable: true,
@@ -83,6 +91,7 @@ function Loans() {
       });
       setLoanApplications([...loanApplications, newLoan]);
       onClose();
+      console.log(formData);
       toast({
         title: 'Loan Application Submitted',
         description: 'Your loan application has been successfully submitted.',
@@ -103,12 +112,16 @@ function Loans() {
   };
 
   return (
-    <Box bg="gray.50" minH="100vh">
-      <Container maxW="container.xl" py={8}>
+    <Box bg="gray.50" minH="100vh" p={8}>
+      <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         <VStack spacing={8} align="stretch">
           <Flex justify="space-between" align="center">
             <VStack align="start" spacing={1}>
-              <Heading size="2xl" color="purple.600">
+              <Heading size="xl" bgGradient="linear(to-r, purple.500, pink.500)" bgClip="text">
                 Loan Center
               </Heading>
               <Text color="gray.600">Manage your loans and applications</Text>
@@ -134,12 +147,16 @@ function Loans() {
             <LoanApplicationsTable loanApplications={loanApplications} />
           </Box>
         </VStack>
-      </Container>
 
-      <LoanApplicationModal isOpen={isOpen} onClose={onClose} onSubmit={handleSubmit} />
+      <LoanApplicationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleSubmit}
+        accounts={accounts}
+      />
+      </MotionBox>
     </Box>
   );
 }
 
 export default Loans;
-

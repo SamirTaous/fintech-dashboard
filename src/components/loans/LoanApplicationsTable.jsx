@@ -18,8 +18,8 @@ const LoanApplicationsTable = ({ loanApplications }) => {
           <Th>Loan Amount</Th>
           <Th>Purpose</Th>
           <Th>Interest Rate</Th>
-          <Th>Status</Th>
           <Th>Application Date</Th>
+          <Th>Status</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -30,6 +30,7 @@ const LoanApplicationsTable = ({ loanApplications }) => {
             </Td>
             <Td>{loan.loanIntent}</Td>
             <Td>{loan.loanIntRate || 'TBD'}%</Td>
+            <Td>{new Date(loan.applicationDate).toLocaleDateString()}</Td>
             <Td>
               <Badge
                 colorScheme={
@@ -43,7 +44,6 @@ const LoanApplicationsTable = ({ loanApplications }) => {
                 {loan.status || 'Pending'}
               </Badge>
             </Td>
-            <Td>{new Date(loan.applicationDate).toLocaleDateString()}</Td>
           </Tr>
         ))}
       </Tbody>

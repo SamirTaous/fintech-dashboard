@@ -8,27 +8,53 @@ import {
   Button 
 } from '@chakra-ui/react';
 import { FiArrowUpRight, FiArrowDownLeft } from 'react-icons/fi';
-import { getTransactionsByClientId } from '../../api/api'; // Assuming API file is in the same directory
+import { getAccountsbyClientID, getTransactionsByCompteId } from '../../api/api'; // Assuming these functions are defined in your API module
+import { jwtDecode } from 'jwt-decode'; // Ensure correct version of jwt-decode is installed
 
 function RecentTransactions() {
   const [transactions, setTransactions] = useState([]);
-  const [clientId, setClientId] = useState(2); // Example client ID, replace with dynamic logic
+  const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchClientData = async () => {
+      const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
       try {
-        const fetchedTransactions = await getTransactionsByClientId(clientId);
-        // Sort transactions by date in descending order
-        const sortedTransactions = fetchedTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        // Limit to the first 6 transactions
-        setTransactions(sortedTransactions.slice(0, 6));
+        const decodedToken = jwtDecode(token); // Decode the token
+        const extractedClientId = decodedToken.user_id; // Extract user_id from token
+        setClientId(extractedClientId);
+
+        if (extractedClientId) {
+          // Fetch accounts by client ID
+          const accounts = await getAccountsbyClientID(extractedClientId);
+
+          if (accounts.length > 0) {
+            const transactionsPromises = accounts.map((account) =>
+              getTransactionsByCompteId(account.id_account)
+            );
+
+            // Wait for all transactions to be fetched
+            const transactionsArrays = await Promise.all(transactionsPromises);
+            const allTransactions = transactionsArrays.flat();
+            console.log(allTransactions);
+            // Sort transactions by date in descending order
+            const sortedTransactions = allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Limit to the first 6 transactions
+            setTransactions(sortedTransactions.slice(0, 6));
+          }
+        }
       } catch (error) {
-        console.error('Error fetching transactions:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchTransactions();
-  }, [clientId]);
+    fetchClientData();
+  }, []);
 
   return ( 
     <Box p={2} borderRadius="lg">
