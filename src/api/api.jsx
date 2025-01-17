@@ -8,7 +8,7 @@ const API_URL4 = import.meta.env.VITE_ACCOUNT_API_URL; // API for accounts
 // API for login (assuming token is returned on login)
 export const login = async (username, password) => {
   try {
-    const response = await axios.post(`${API_URL1}`, { username, password });
+    const response = await axios.post(`${API_URL1}/login`, { username, password });
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
