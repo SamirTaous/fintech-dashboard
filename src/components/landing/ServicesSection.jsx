@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Flex, Text, Grid, VStack, Icon } from '@chakra-ui/react';
-import { FaWallet, FaExchangeAlt, FaPiggyBank, FaMobileAlt } from 'react-icons/fa';
+import { FaWallet, FaExchangeAlt, FaPiggyBank, FaMobileAlt, FaMoneyCheckAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import CreditCard from './CreditCard';
 
@@ -163,11 +163,12 @@ const ServicesSection = () => {
             isHighlighted={false}
           />
           <ServiceCard
-            icon={FaPiggyBank}
-            title="Savings and Investments"
-            description="Secure savings accounts to grow your funds with competitive interest rates and smart financial tools."
+            icon={FaMoneyCheckAlt}
+            title="Cash Loans"
+            description="Flexible cash loans tailored to your needs with competitive rates and quick approval."
             isHighlighted={false}
           />
+
           <ServiceCard
             icon={FaMobileAlt}
             title="Financial Management Anywhere"

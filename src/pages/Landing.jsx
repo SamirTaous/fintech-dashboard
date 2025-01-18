@@ -4,6 +4,8 @@ import Navbar from '../components/landing/Navbar'
 import HeroSection from '../components/landing/HeroSection'
 import { Box } from '@chakra-ui/react'
 import ServicesSection from '../components/landing/ServicesSection'
+import CTASection from '../components/landing/CTASection'
+import Footer from '../components/landing/Footer'
 
 const Landing = () => {
   return (
@@ -11,6 +13,8 @@ const Landing = () => {
         <Navbar/>
         <HeroSection/>
         <ServicesSection/>
+        <CTASection/>
+        <Footer/>
     </Box>
   )
 }
