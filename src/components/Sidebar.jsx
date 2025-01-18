@@ -6,6 +6,7 @@ import {
   Text,
   Flex,
   IconButton,
+  Image,
   Tooltip,
   Divider,
   Avatar,
@@ -67,7 +68,7 @@ function Sidebar({ isOpen, onToggle }) {
   return (
     <Flex
       bg={bgColor}
-      w={isOpen ? '240px' : '72px'}
+      w={isOpen ? '240px' : '90px'}
       transition="width 0.3s ease"
       borderRight="1px"
       borderColor="whiteAlpha.200"
@@ -93,20 +94,14 @@ function Sidebar({ isOpen, onToggle }) {
       />
 
       {/* Logo Section */}
-      <Flex p={2} align="center" h="60px" transition="all 0.3s" mb={6}>
-        <Icon as={FiCompass} boxSize="30px" color="white" />
-        {isOpen && (
-          <Text
-            fontSize="xl"
-            fontWeight="bold"
-            color="white"
-            ml={3}
-            transition="opacity 0.3s"
-          >
-            Bank Name
-          </Text>
-        )}
+      <Flex p={2} align="center" h="60px" transition="all 0.3s" mb={6} w="100%">
+        <Image
+          src={isOpen ? "/asmas-logo-light.png" : "/asmas-logo-light-cropped.png"} // Conditional image based on isOpen
+          h="35px"
+          alt="Bank Logo"
+        />
       </Flex>
+
 
       {/* Main Navigation */}
       <VStack spacing={2} align="stretch" flex={1}>
