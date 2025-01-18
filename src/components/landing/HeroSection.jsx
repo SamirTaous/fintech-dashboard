@@ -1,5 +1,11 @@
 import { Flex, Box, Heading, Button, Image, Text, ButtonGroup } from '@chakra-ui/react';
 import React from 'react';
+import { motion } from 'framer-motion';
+import { MdOutlineBrokenImage } from 'react-icons/md';
+
+const MotionBox = motion(Box);
+const MotionText = motion(Text);
+const MotionImage = motion(Image);
 
 const HeroSection = () => {
   return (
@@ -7,14 +13,23 @@ const HeroSection = () => {
       justifyContent="space-between"
       alignItems="center"
       mt={10}
-      ml='50px'
-      mr='50px'
+      ml='5%'
+      mr='5%'
       flexWrap="wrap"
       position="relative"
     >
       {/* Left Content */}
-      <Box margin="0 40px" maxW="1000px" textAlign="left" zIndex={2}>
-        <Text
+      <MotionBox
+        margin="0 40px"
+        maxW="1000px"
+        textAlign="left"
+        zIndex={2}
+        initial={{ opacity: 0, x: -200 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+      >
+        <MotionText
           as="h1"
           fontFamily="Poppins"
           fontWeight="semibold"
@@ -22,10 +37,13 @@ const HeroSection = () => {
           color="black"
           opacity='80%'
           lineHeight="1"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 0.8, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
         >
           Innovate <br/>
           your <Text as="span" fontWeight="extrabold" opacity="100" bgGradient="linear(to-r, black, #BF8AFF)" bgClip="text"> banking </Text> experience
-        </Text> 
+        </MotionText> 
         <Flex mt={12} gap={8}>
             <Button
                 size="lg"
@@ -66,7 +84,7 @@ const HeroSection = () => {
                 Learn more
           </Button>
         </Flex>
-      </Box>
+      </MotionBox>
 
       {/* Right Image */}
       <Box 
@@ -77,10 +95,13 @@ const HeroSection = () => {
         mt={0} 
         zIndex={1}
       >
-        <Image
+        <MotionImage
           src="/credit-cards.png"
           alt="Cards"
           w="600px"
+          initial={{ scale: 0.9, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
         />
       </Box>
     </Flex>

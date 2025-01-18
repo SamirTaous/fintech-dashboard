@@ -168,28 +168,17 @@ function Overview() {
           </Heading>
           <Text color="gray.600">Get a snapshot of your financial activity </Text>
         </VStack>
-        {/* <HStack spacing={4}>
-          <Button leftIcon={<FaPlus />} variant="outline" colorScheme="purple">
-            Add Money
-          </Button>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<FaChevronDown />} colorScheme="purple">
-              Quick Actions
-            </MenuButton>
-            <MenuList>
-              <MenuItem icon={<FaPaperPlane />}>Send Money</MenuItem>
-              <MenuItem icon={<FaDownload />}>Request Payment</MenuItem>
-              <MenuItem icon={<FaCreditCard />}>Link New Card</MenuItem>
-            </MenuList>
-          </Menu>
-        </HStack> */}
       </Flex>
       
 
       {/* Main Grid Section */}
-      <Grid templateColumns="repeat(6, 1fr)" templateRows="repeat(4, auto)" gap={6}>
+      <Grid 
+        templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", md: "repeat(6, 1fr)" }} 
+        templateRows="repeat(4, auto)" 
+        gap={6}
+      >
         {/* Balance Card */}
-        <GridItem colSpan={3} rowSpan={2}>
+        <GridItem colSpan={{ base: 1, md: 3 }} rowSpan={{ base: 1, md: 2 }}>
           <Box
             bgGradient={bgGradient}
             color="white"
@@ -233,7 +222,7 @@ function Overview() {
         </GridItem>
 
         {/* Stat Cards */}
-        <GridItem colSpan={1}>
+        <GridItem colSpan={{ base: 1, sm: 1 }} rowSpan={1}>
           <Box bg="white" p={4} borderRadius="xl" boxShadow="sm">
             <VStack align="stretch" spacing={2}>
               <HStack color="green.500">
@@ -248,7 +237,7 @@ function Overview() {
           </Box>
         </GridItem>
 
-        <GridItem colSpan={1}>
+        <GridItem colSpan={{ base: 1, sm: 1 }} rowSpan={1}>
           <Box bg="white" p={4} borderRadius="xl" boxShadow="sm">
             <VStack align="stretch" spacing={2}>
               <HStack color="red.500">
@@ -263,7 +252,7 @@ function Overview() {
           </Box>
         </GridItem>
 
-        <GridItem colSpan={1}>
+        <GridItem colSpan={{ base: 1, sm: 1 }} rowSpan={1}>
           <Box bg="white" p={4} borderRadius="xl" boxShadow="sm">
             <VStack align="stretch" spacing={2}>
               <HStack color="purple.500">
@@ -279,7 +268,7 @@ function Overview() {
         </GridItem>
 
         {/* Quick Actions */}
-        <GridItem colSpan={3}>
+        <GridItem colSpan={{ base: 1, md: 3 }}>
           <Grid templateColumns="repeat(auto-fit, minmax(150px, 1fr))" gap={4}>
             <QuickAction icon={FaPaperPlane} label="Send" />
             <QuickAction icon={FaDownload} label="Request" />
@@ -288,7 +277,7 @@ function Overview() {
         </GridItem>
 
         {/* Chart Section */}
-        <GridItem colSpan={4} rowSpan={2}>
+        <GridItem colSpan={{ base: 1, md: 4 }} rowSpan={{ base: 1, md: 2 }}>
           <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
             <Flex justify="space-between" align="center" mb={6}>
               <VStack align="start" spacing={1}>
@@ -305,7 +294,7 @@ function Overview() {
         </GridItem>
 
         {/* Recent Transactions */}
-        <GridItem colSpan={2} rowSpan={2}>
+        <GridItem colSpan={{ base: 1, md: 2 }} rowSpan={{ base: 1, md: 2 }}>
           <Box bg="white" p={6} borderRadius="xl" boxShadow="sm" h="full">
             <Flex justify="space-between" align="center" mb={6}>
               <VStack align="start" spacing={1}>
@@ -318,7 +307,7 @@ function Overview() {
                 View All
               </Button>
             </Flex>
-            <RecentTransactions transactions={transactions.slice(0, 6)} />
+            <RecentTransactions transactions={transactions} />
           </Box>
         </GridItem>
       </Grid>
