@@ -95,7 +95,7 @@ function Overview() {
     accountNumber: '',
     employe_id: '',
     client_id: '',
-    compteCreID: '',
+    compteId: '',
   });
 
   useEffect(() => {
@@ -167,10 +167,10 @@ function Overview() {
         description: formData.description,
         date: new Date().toISOString(),
         amount: parseFloat(formData.amount),
-        compteId: requestedAccount.id_account,
+        compteId: formData.compteId,
         employe_id: 1, 
         client_id: jwtDecode(localStorage.getItem('authToken')).user_id,
-        compteCreID: formData.compteCreID,
+        compteCreID: requestedAccount.id_account,
       };
       console.log(virementData);
     if(virementData.compteCreID!=virementData.compteId){
@@ -421,8 +421,8 @@ function Overview() {
               <FormControl isRequired>
                 <FormLabel>Select Account</FormLabel>
                 <Select
-                  name="compteCreID"
-                  value={formData.compteCreID || ''}
+                  name="compteId"
+                  value={formData.compteId || ''}
                   onChange={handleChange}
                 >
                   <option value="">Select an Account</option>
