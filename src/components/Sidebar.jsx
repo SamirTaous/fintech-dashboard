@@ -41,6 +41,7 @@ const menuItems = [
   { icon: FiDollarSign, text: 'Transactions', path: '/transactions' },
   { icon: FiCreditCard, text: 'Cards', path: '/cards' },
   { icon: FiFileText, text: 'Loans', path: '/loans' },
+  { icon: FiFileText, text: 'Bills', path: '/bills' },
 ];
 
 const bottomMenuItems = [

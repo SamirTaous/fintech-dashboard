@@ -173,6 +173,7 @@ function Overview() {
         compteCreID: formData.compteCreID,
       };
       console.log(virementData);
+    if(virementData.compteCreID!=virementData.compteId){
       await addVirement(virementData);
       toast({
         title: 'Transfer successful',
@@ -181,6 +182,15 @@ function Overview() {
         isClosable: true,
       });
       onClose();
+    }
+    else{
+      toast({
+        description: 'The recipient account number cannot match your account number',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
     } catch (error) {
       toast({
         title: 'Transfer failed',
@@ -406,34 +416,59 @@ function Overview() {
           <ModalHeader>Transfer Money</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <form onSubmit={handleSubmit}>
-              <VStack spacing={4}>
-                {/* New Account Selection Dropdown */}
-                <FormControl isRequired>
-                  <FormLabel>Select Account</FormLabel>
-                  <Select name="compteCreID" value={formData.compteCreID} onChange={handleChange}>
-                    <option value="">Select an Account</option>
-                    {accounts.map((account) => (
-                      <option key={account.id_account} value={account.id_account}>
-                        {account.accountNumber} 
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Description</FormLabel>
-                  <Input name="description" value={formData.description} onChange={handleChange} />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Amount</FormLabel>
-                  <Input name="amount" type="number" value={formData.amount} onChange={handleChange} />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Recipient Account Number</FormLabel>
-                  <Input name="accountNumber" value={formData.accountNumber} onChange={handleChange} />
-                </FormControl>
-              </VStack>
-            </form>
+          <form onSubmit={handleSubmit}>
+            <VStack spacing={4}>
+              <FormControl isRequired>
+                <FormLabel>Select Account</FormLabel>
+                <Select
+                  name="compteCreID"
+                  value={formData.compteCreID || ''}
+                  onChange={handleChange}
+                >
+                  <option value="">Select an Account</option>
+                  {accounts.map((account) => (
+                    <option key={account.id_account} value={account.id_account}>
+                      {account.accountNumber}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+              
+              <FormControl isRequired>
+                <FormLabel>Description</FormLabel>
+                <Input
+                  name="description"
+                  value={formData.description || ''}
+                  onChange={handleChange}
+                  placeholder="Enter description"
+                />
+              </FormControl>
+              
+              <FormControl isRequired>
+                <FormLabel>Amount</FormLabel>
+                <Input
+                  name="amount"
+                  type="number"
+                  value={formData.amount || ''}
+                  onChange={handleChange}
+                  min="0"
+                  step="any"
+                  placeholder="Enter amount"
+                />
+              </FormControl>
+              
+              <FormControl isRequired>
+                <FormLabel>Recipient Account Number</FormLabel>
+                <Input
+                  name="accountNumber"
+                  value={formData.accountNumber || ''}
+                  onChange={handleChange}
+                  placeholder="Enter recipient account number"
+                />
+              </FormControl>
+            </VStack>
+          </form>
+
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="purple" type="submit" onClick={handleSubmit}>

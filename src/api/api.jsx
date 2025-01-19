@@ -102,3 +102,38 @@ export const getAccountsbyClientID = async (clientId, token) => {
     }
   };
 
+// API FOR SHOWING ALL BILLERS
+
+export const getAllBillers = async () => {
+  try {
+    const response = await axios.get(`${API_URL2}/Factures/billers`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all billers:', error);
+    throw error;
+  }
+};
+
+// API FOR SHOWING BILLER BY ID 
+
+export const getBillerById = async (billerid) => {
+  try {
+    const response = await axios.get(`${API_URL2}/Factures/billers/${billerid}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching biller by id:', error);
+    throw error;
+  }
+};
+
+// API FOR PAYING A BILL
+
+export const payFacture = async (billData) => {
+  try {
+    const response = await axios.post(`${API_URL2}/Factures/pay`, billData);
+    return response.data;
+  } catch (error) {
+    console.error('Error paying bill:', error);
+    throw error;
+  }
+};
