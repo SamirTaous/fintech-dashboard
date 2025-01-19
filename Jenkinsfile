@@ -50,8 +50,8 @@ pipeline {
                             sonar-scanner \
                                 -Dsonar.projectKey=${COMPONENT_NAME}-project \
                                 -Dsonar.sources=src \
-                                -Dsonar.host.url=${env.SONAR_HOST} \
-                                -Dsonar.login=${env.SONAR_TOKEN} \
+                                -Dsonar.host.url=${SONAR_HOST} \
+                                -Dsonar.login=${SONAR_TOKEN} \
                                 -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                         """
                     }
