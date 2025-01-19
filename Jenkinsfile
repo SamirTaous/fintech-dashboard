@@ -8,6 +8,9 @@ pipeline {
         AWS_REGION = 'eu-west-3'
         ECR_REGISTRY = '329599629502.dkr.ecr.eu-west-3.amazonaws.com'
         IMAGE_NAME = 'frontend'
+        COMPONENT_NAME = 'Front'
+        SONAR_TOKEN = '39cc334a0a13dc54d616ab48a6949fae534f6b15'
+        SONAR_HOST = 'http://192.168.0.147:9000'
     }
     stages {
         stage('Checkout') {
@@ -39,7 +42,23 @@ pipeline {
                sh 'npm run build'
             }
         }
-        stage('Build Docker Image') {
+         stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=${COMPONENT_NAME}-project \
+                                -Dsonar.sources=src \
+                                -Dsonar.host.url=${env.SONAR_HOST} \
+                                -Dsonar.login=${env.SONAR_TOKEN} \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                        """
+                    }
+                }
+            }
+        }
+        /*stage('Build Docker Image') {
             steps {
                 script {
                     def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -78,7 +97,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         /*stage('Deploy to EKS') {
             steps {
                 script {
