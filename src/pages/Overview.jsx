@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Grid,
@@ -15,6 +16,18 @@ import {
   MenuItem,
   useColorModeValue,
   Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
   FaArrowAltCircleDown,
@@ -33,8 +46,7 @@ import OverviewChart from '../components/charts/OverviewChart';
 import RecentTransactions from '../components/transactions/RecentTransactions';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { useEffect, useState } from 'react';
-import { getAccountsbyClientID, getTransactionsByCompteId } from '../api/api';
+import { getAccountsbyClientID, getTransactionsByCompteId, addVirement, getAccountByNumber } from '../api/api';
 
 const MotionBox = motion(Box);
 
@@ -72,6 +84,19 @@ function Overview() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+
+  const [formData, setFormData] = useState({
+    description: '',
+    amount: '',
+    accountNumber: '',
+    employe_id: '',
+    client_id: '',
+    compteCreID: '',
+  });
 
   useEffect(() => {
     const fetchAccountsAndTransactions = async () => {
@@ -92,6 +117,7 @@ function Overview() {
         const balance = accounts.reduce((sum, account) => sum + account.balance, 0);
         setTotalBalance(balance);
         setAccountCount(accounts.length);
+        setAccounts(accounts);
 
         // Fetch transactions for each account
         const allTransactions = [];
@@ -123,6 +149,49 @@ function Overview() {
 
     fetchAccountsAndTransactions();
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const requestedAccount= await getAccountByNumber(formData.accountNumber);
+      console.log(requestedAccount.id_account);
+      const virementData = {
+        description: formData.description,
+        date: new Date().toISOString(),
+        amount: parseFloat(formData.amount),
+        compteId: requestedAccount.id_account,
+        employe_id: 1, 
+        client_id: jwtDecode(localStorage.getItem('authToken')).user_id,
+        compteCreID: formData.compteCreID,
+      };
+      console.log(virementData);
+      await addVirement(virementData);
+      toast({
+        title: 'Transfer successful',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      onClose();
+    } catch (error) {
+      toast({
+        title: 'Transfer failed',
+        description: 'An error occurred while processing your transfer.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      console.error('Error adding virement:', error);
+    }
+  };
 
   // Calculate month-over-month changes
   const calculateMonthlyChange = (currentAmount, transactions) => {
@@ -270,9 +339,26 @@ function Overview() {
         {/* Quick Actions */}
         <GridItem colSpan={{ base: 1, md: 3 }}>
           <Grid templateColumns="repeat(auto-fit, minmax(150px, 1fr))" gap={4}>
-            <QuickAction icon={FaPaperPlane} label="Send" />
+            <QuickAction
+              icon={FaPaperPlane}
+              label="Send"
+              onClick={() => {
+                if (accounts && accounts.length > 0) {
+                  setSelectedAccount(accounts[0]);
+                  onOpen();
+                } else {
+                  toast({
+                    title: 'No accounts available',
+                    description: 'Please add an account before making a transfer.',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                }
+              }}
+            />
             <QuickAction icon={FaDownload} label="Request" />
-            <QuickAction icon={BsCashStack} label="Top Up" />
+            <QuickAction icon={BsCashStack} label="Pay Bill" />
           </Grid>
         </GridItem>
 
@@ -312,6 +398,51 @@ function Overview() {
         </GridItem>
       </Grid>
       </MotionBox>
+
+      {/* Transfer Money Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Transfer Money</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={4}>
+                {/* New Account Selection Dropdown */}
+                <FormControl isRequired>
+                  <FormLabel>Select Account</FormLabel>
+                  <Select name="compteCreID" value={formData.compteCreID} onChange={handleChange}>
+                    <option value="">Select an Account</option>
+                    {accounts.map((account) => (
+                      <option key={account.id_account} value={account.id_account}>
+                        {account.accountNumber} 
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Description</FormLabel>
+                  <Input name="description" value={formData.description} onChange={handleChange} />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Amount</FormLabel>
+                  <Input name="amount" type="number" value={formData.amount} onChange={handleChange} />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Recipient Account Number</FormLabel>
+                  <Input name="accountNumber" value={formData.accountNumber} onChange={handleChange} />
+                </FormControl>
+              </VStack>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="purple" type="submit" onClick={handleSubmit}>
+              Send
+            </Button>
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
