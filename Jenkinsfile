@@ -42,7 +42,7 @@ pipeline {
                sh 'npm run build'
             }
         }
-         stage('SonarQube Analysis') {
+         /*stage('SonarQube Analysis') {
             steps {
                 script {
                     withSonarQubeEnv('sonarqube') {
@@ -57,8 +57,8 @@ pipeline {
                     }
                 }
             }
-        }
-        /*stage('Build Docker Image') {
+        }*/
+        stage('Build Docker Image') {
             steps {
                 script {
                     def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -97,7 +97,7 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
         /*stage('Deploy to EKS') {
             steps {
                 script {
