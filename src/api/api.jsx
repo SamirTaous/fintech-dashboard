@@ -3,7 +3,8 @@ import axios from 'axios';
 const API_URL1 = 'http://localhost:8081/auth'; // API for authentification
 const API_URL2 = 'http://localhost:8084/api' // API for transactions
 const API_URL3 = 'http://localhost:8082/api/loan-applications'; // API for loan applications
-const API_URL4 = 'http://localhost:8085/accounts'
+const API_URL4 = 'http://localhost:8085/accounts' // API for accounts
+const API_URL5 = 'http://localhost:8083/users/clients' // API for user clients
 
 // API for login (assuming token is returned on login)
 export const login = async (username, password) => {
@@ -134,6 +135,30 @@ export const payFacture = async (billData) => {
     return response.data;
   } catch (error) {
     console.error('Error paying bill:', error);
+    throw error;
+  }
+};
+
+// API FOR GETTING USER BY ID 
+
+export const getClientById = async (clientid) => {
+  try {
+    const response = await axios.get(`${API_URL5}/${clientid}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching client by id:', error);
+    throw error;
+  }
+};
+
+// API FOR UPDATING CLIENT BY CLIENT ID 
+
+export const updateClient = async (clientid,updatedClient) => {
+  try {
+    const response = await axios.put(`${API_URL5}/${clientid}`,updatedClient);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating client credentials:', error);
     throw error;
   }
 };
