@@ -105,7 +105,7 @@ pipeline {
                      
                       //Authentification
                         sh """
-                            aws eks update-kubeconfig --name your-eks-cluster-name --region your-aws-region
+                            aws eks update-kubeconfig --name main-eks-cluster --region your-aws-region
                         """
                        // Déploiement des ressources
                         sh """
