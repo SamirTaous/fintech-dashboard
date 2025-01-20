@@ -98,7 +98,7 @@ pipeline {
                 }
             }
         }
-        /*stage('Deploy to EKS') {
+        stage('Deploy to EKS') {
             steps {
                 script {
                    withCredentials([aws(credentialsId: 'aws-credentials')]) {
@@ -109,13 +109,12 @@ pipeline {
                         """
                        // Déploiement des ressources
                         sh """
-                          kubectl apply -f k8s/configmap.yaml
-                           kubectl apply -f k8s/deployment.yaml
+                          kubectl apply -f kubernetes/config-map.yaml
                         """
                     }
                 }
             }
-        }*/
+        }
         stage('Cleanup') {
             steps {
                 script {
