@@ -14,6 +14,7 @@ import { FaCreditCard, FaWifi, FaLock, FaEllipsisH, FaPause } from 'react-icons/
 import { SiVisa, SiMastercard } from 'react-icons/si';
 
 export const CardComponent = ({ card, onLockToggle, onFreezeToggle }) => {
+  // --- No change needed here, object destructuring is fine ---
   const { cardNumber, expiryDate, balance, cardType, holderName, isLocked, isFrozen, color } = card;
 
   const bgGradient = `linear-gradient(135deg, ${color[0]}, ${color[1]})`;
@@ -59,7 +60,7 @@ export const CardComponent = ({ card, onLockToggle, onFreezeToggle }) => {
           </Flex>
 
           <Text color="white" fontSize="xl" letterSpacing={8} mt={4}>
-            **** **** **** {cardNumber.slice(-4)}
+            **** **** **** {cardNumber?.slice(-4) || '1234'}
           </Text>
 
           <Flex justify="space-between" align="flex-end">
@@ -67,14 +68,18 @@ export const CardComponent = ({ card, onLockToggle, onFreezeToggle }) => {
               <Text color="whiteAlpha.700" fontSize="xs" mb={1}>
                 Card Holder
               </Text>
+              {/* --- THE FIX ---
+                  This line now safely handles cases where holderName might be missing.
+                  It uses optional chaining (?.) and provides a fallback 'CARD HOLDER' text.
+              --- */}
               <Text color="white" fontSize="sm" fontWeight="bold">
-                {holderName.toUpperCase()}
+                {holderName?.toUpperCase() || 'CARD HOLDER'}
               </Text>
               <Text color="whiteAlpha.700" fontSize="xs" mt={2}>
                 Expires
               </Text>
               <Text color="white" fontSize="sm">
-                {expiryDate}
+                {expiryDate || 'N/A'}
               </Text>
             </Box>
             <Box textAlign="right">
@@ -82,7 +87,7 @@ export const CardComponent = ({ card, onLockToggle, onFreezeToggle }) => {
                 Balance
               </Text>
               <Text color="white" fontSize="xl" fontWeight="bold">
-                ${balance}
+                ${balance || '0.00'}
               </Text>
             </Box>
           </Flex>
@@ -131,4 +136,3 @@ export const CardComponent = ({ card, onLockToggle, onFreezeToggle }) => {
     </Box>
   );
 };
-

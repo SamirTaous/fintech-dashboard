@@ -19,12 +19,6 @@ import {
   InputLeftElement,
   Input,
   Select,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  IconButton,
-  Tooltip,
   useColorModeValue,
   Stat,
   StatLabel,
@@ -32,12 +26,13 @@ import {
   StatHelpText,
   StatArrow,
   SimpleGrid,
-  Progress,
+  Spinner, // Added Spinner for loading state
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaSearch, FaFilter, FaEllipsisV, FaFileExport, FaPlus, FaChartBar, FaWallet } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { jwtDecode } from 'jwt-decode';
-import { getAccountsbyClientID, getTransactionsByCompteId } from '../api/api';
+// --- FIX #1: Make sure we import the CORRECT renamed function ---
+import { getAccountsbyClientID, getTransactionsByAccountId } from '../api/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const MotionBox = motion(Box);
@@ -61,7 +56,7 @@ const TransactionRow = ({ transaction }) => {
           borderRadius="full"
           textTransform="capitalize"
         >
-          {isIncome ? 'Income' : 'Expense'}
+          {transaction.type} {/* Displaying the actual type from data */}
         </Badge>
       </Td>
     </Tr>
@@ -80,6 +75,7 @@ function Transactions() {
       const token = localStorage.getItem('authToken');
       if (!token) {
         console.error('No token found');
+        setIsLoading(false);
         return;
       }
 
@@ -94,13 +90,16 @@ function Transactions() {
           return;
         }
 
-        const transactionsData = [];
-        for (const account of accounts) {
-          const accountTransactions = await getTransactionsByCompteId(account.id_account, token);
-          transactionsData.push(...accountTransactions);
-        }
+        const transactionsPromises = accounts.map(account => 
+            // --- FIX #2: Use the correct function name: getTransactionsByAccountId ---
+            // --- FIX #3: Use the correct property: account.id instead of account.id_account ---
+            getTransactionsByAccountId(account.id, token)
+        );
+        
+        const transactionsForAllAccounts = await Promise.all(transactionsPromises);
+        const flattenedTransactions = transactionsForAllAccounts.flat(); // .flat() combines the arrays of transactions into one
 
-        setTransactions(transactionsData);
+        setTransactions(flattenedTransactions);
       } catch (error) {
         console.error('Error fetching accounts or transactions:', error);
       } finally {
@@ -110,8 +109,9 @@ function Transactions() {
 
     fetchTransactions();
   }, []);
+  
+  // The rest of your component logic remains the same, it will now work because 'transactions' will have data.
 
-  // Filtered transactions based on search, type, and time range
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'all' || (filterType === 'income' ? transaction.amount > 0 : transaction.amount < 0);
@@ -122,13 +122,19 @@ function Transactions() {
     
     switch (timeRange) {
       case 'week':
-        matchesTimeRange = transactionDate >= new Date(now.setDate(now.getDate() - 7));
+        const lastWeek = new Date();
+        lastWeek.setDate(now.getDate() - 7);
+        matchesTimeRange = transactionDate >= lastWeek;
         break;
       case 'month':
-        matchesTimeRange = transactionDate >= new Date(now.setMonth(now.getMonth() - 1));
+        const lastMonth = new Date();
+        lastMonth.setMonth(now.getMonth() - 1);
+        matchesTimeRange = transactionDate >= lastMonth;
         break;
       case 'year':
-        matchesTimeRange = transactionDate >= new Date(now.setFullYear(now.getFullYear() - 1));
+        const lastYear = new Date();
+        lastYear.setFullYear(now.getFullYear() - 1);
+        matchesTimeRange = transactionDate >= lastYear;
         break;
       default:
         break;
@@ -137,29 +143,27 @@ function Transactions() {
     return matchesSearch && matchesType && matchesTimeRange;
   });
 
-  // Calculate totals
   const incomeTotal = filteredTransactions
     .filter((transaction) => transaction.amount > 0)
     .reduce((total, transaction) => total + transaction.amount, 0);
 
-  const expensesTotal = filteredTransactions
+  const expensesTotal = Math.abs(filteredTransactions
     .filter((transaction) => transaction.amount < 0)
-    .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+    .reduce((total, transaction) => total + transaction.amount, 0));
 
   const netIncome = incomeTotal - expensesTotal;
 
-  // Prepare data for chart
   const chartData = filteredTransactions
-    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by most recent date
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
     .map((transaction) => ({
-      date: new Date(transaction.date).toLocaleDateString(),
+      date: new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       amount: transaction.amount,
     }));
 
   if (isLoading) {
     return (
       <Flex justify="center" align="center" minH="100vh">
-        <Text>Loading...</Text>
+        <Spinner size="xl" color="purple.500" />
       </Flex>
     );
   }
@@ -182,26 +186,14 @@ function Transactions() {
             <Stat bg="green.100" p={4} borderRadius="lg" shadow="sm">
               <StatLabel>Total Income</StatLabel>
               <StatNumber color="green.500">${incomeTotal.toFixed(2)}</StatNumber>
-              <StatHelpText>
-                <StatArrow type="increase" />
-                23.36%
-              </StatHelpText>
             </Stat>
             <Stat bg="red.100" p={4} borderRadius="lg" shadow="sm">
               <StatLabel>Total Expenses</StatLabel>
               <StatNumber color="red.500">${expensesTotal.toFixed(2)}</StatNumber>
-              <StatHelpText>
-                <StatArrow type="decrease" />
-                9.05%
-              </StatHelpText>
             </Stat>
             <Stat bg="purple.100" p={4} borderRadius="lg" shadow="sm">
               <StatLabel>Net Income</StatLabel>
               <StatNumber color="purple.500">${netIncome.toFixed(2)}</StatNumber>
-              <StatHelpText>
-                <StatArrow type={netIncome > 0 ? "increase" : "decrease"} />
-                {Math.abs(((netIncome / incomeTotal) * 100).toFixed(2))}%
-              </StatHelpText>
             </Stat>
           </SimpleGrid>
 
@@ -214,7 +206,7 @@ function Transactions() {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <RechartsTooltip />
-                  <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+                  <Line type="monotone" dataKey="amount" stroke="#8884d8" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </Box>

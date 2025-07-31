@@ -11,29 +11,35 @@ import {
   Text,
   useToast,
   FormErrorMessage,
-  Image,
   HStack,
   InputGroup,
   InputRightElement,
-  IconButton
+  IconButton,
+  Link,
+  Icon,
 } from '@chakra-ui/react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import React Icons
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { login } from '../api/api'; // Import the login function from the API
-import axios from 'axios'; // Import Axios for API calls
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../api/api';
+import { motion } from 'framer-motion';
+import { FaCreditCard } from 'react-icons/fa';
+
+// Re-introducing Motion components for animations
+const MotionBox = motion(Box);
 
 export default function LoginPage() {
-  const [username, setUsername] = useState(''); // Changed email to username
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
+  // No changes to logic, it's solid.
   const validateForm = () => {
     const newErrors = {};
-    if (!username) newErrors.username = 'Username is required'; // Changed email to username
+    if (!username) newErrors.username = 'Username is required';
     if (!password) newErrors.password = 'Password is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,159 +51,106 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Call the login API
       const { token } = await login(username, password);
-
-      // Save the token in localStorage (or cookies for better security)
       localStorage.setItem('authToken', token);
-      console.log(token);
 
-      // Show success toast
       toast({
-        title: 'Login successful',
+        title: 'Login Successful',
+        description: "Welcome back! You'll be redirected shortly.",
         status: 'success',
-        duration: 2000, // Show for 2 seconds
+        duration: 2000,
         isClosable: true,
+        position: 'top',
       });
 
-      // Delay navigation to allow toast to be visible
-      setTimeout(() => {
-        navigate('/overview'); // Navigate to the next page
-      }, 2000); // Navigate after 2 seconds
+      setTimeout(() => navigate('/overview'), 1500);
     } catch (error) {
-      // Show error toast
       toast({
-        title: 'Invalid credentials',
-        description: 'Please check your username and password',
+        title: 'Login Failed',
+        description: 'Please check your username and password.',
         status: 'error',
         duration: 3000,
         isClosable: true,
+        position: 'top',
       });
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
     <Box
       minH="100vh"
-      bg="linear-gradient(135deg, #9747FF 0%, #7B3FE4 100%)"
-      py={10}
-      position="relative"
-      overflow="hidden"
+      // --- THEME FIX: Re-instating your original brand gradient ---
+      bgGradient="linear(to-br, #9747FF, #7B3FE4)"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      p={4}
     >
-      {/* Decorative card images */}
-      <Box
-        position="absolute"
-        right="-5%"
-        top="5%"
-        transform="rotate(15deg)"
-        opacity={0.1}
-        width="400px"
-      >
-        <Image src="/placeholder.svg?height=250&width=400" alt="Decorative card" />
-      </Box>
-      <Box
-        position="absolute"
-        left="-5%"
-        bottom="5%"
-        transform="rotate(-15deg)"
-        opacity={0.1}
-        width="400px"
-      >
-        <Image src="/placeholder.svg?height=250&width=400" alt="Decorative card" />
-      </Box>
-
-      <Container maxW="lg" position="relative" zIndex={1}>
-        <VStack spacing={8} align="center" mb={8}>
-          <Heading
-            size="2xl"
-            color="white"
-            fontWeight="bold"
-            letterSpacing="-0.02em"
-            textAlign="center"
-          >
-            <Text
-              fontFamily="Poppins"
-              fontWeight="semibold"
-            >
-              Welcome to Modern Banking
-            </Text>
-          </Heading>
-          <Text
-            fontFamily="Poppins"
-            fontWeight="semibold"
-            color="whiteAlpha.900"
-            fontSize="25px"
-            textAlign="center"
-            maxW="1000px"
-          >
-            Access your account securely and experience innovative banking
-          </Text>
-        </VStack>
-
-        <Box
-          bg="white"
-          p={10}
-          rounded="2xl"
-          shadow="2xl"
-          borderWidth="1px"
-          borderColor="whiteAlpha.200"
-          backdropFilter="blur(10px)"
+      <Container maxW="md">
+        <MotionBox
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <VStack spacing={8} align="stretch">
+          <VStack spacing={4} mb={8} align="center">
+            {/* Keeping the logo, but making it white for better contrast on purple */}
+            <Icon as={FaCreditCard} w={10} h={10} color="whiteAlpha.800" />
+            <Heading as="h1" size="xl" color="white" fontWeight="bold">
+              Welcome to Modern Banking
+            </Heading>
+            <Text color="whiteAlpha.900">
+              Access your account securely.
+            </Text>
+          </VStack>
+
+          <MotionBox
+            whileHover={{ scale: 1.02, y: -5 }}
+            transition={{ duration: 0.2 }}
+            // --- THEME FIX: Using your white card design ---
+            bg="white"
+            p={8}
+            rounded="xl"
+            shadow="2xl"
+          >
             <form onSubmit={handleSubmit}>
               <VStack spacing={6}>
-                <FormControl isInvalid={errors.username}>
-                  <FormLabel
-                    fontSize="sm"
-                    fontWeight="500"
-                    color="gray.700"
-                  >
-                    Username
-                  </FormLabel>
+                <FormControl isInvalid={!!errors.username}>
+                  {/* --- THEME FIX: Text color for a white background --- */}
+                  <FormLabel color="gray.600">Username</FormLabel>
                   <Input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your username"
+                    placeholder="demo@asmasbank.com"
                     size="lg"
-                    fontSize="md"
-                    borderRadius="xl"
-                    borderWidth="2px"
+                    // --- THEME FIX: Standard input style for white bg ---
                     _focus={{
                       borderColor: "purple.500",
-                      boxShadow: "0 0 0 1px #9747FF",
+                      boxShadow: "0 0 0 1px #805AD5", // Corresponds to purple.500
                     }}
                   />
                   <FormErrorMessage>{errors.username}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isInvalid={errors.password}>
-                  <FormLabel
-                    fontSize="sm"
-                    fontWeight="500"
-                    color="gray.700"
-                  >
-                    Password
-                  </FormLabel>
+                <FormControl isInvalid={!!errors.password}>
+                  <FormLabel color="gray.600">Password</FormLabel>
                   <InputGroup size="lg">
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      fontSize="md"
-                      borderRadius="xl"
-                      borderWidth="2px"
                       _focus={{
                         borderColor: "purple.500",
-                        boxShadow: "0 0 0 1px #9747FF",
+                        boxShadow: "0 0 0 1px #805AD5",
                       }}
                     />
                     <InputRightElement>
                       <IconButton
                         variant="ghost"
+                        color="gray.400"
+                        _hover={{ color: 'gray.600' }}
                         onClick={() => setShowPassword(!showPassword)}
                         icon={showPassword ? <FaEyeSlash /> : <FaEye />}
                         aria-label={showPassword ? "Hide password" : "Show password"}
@@ -212,44 +165,31 @@ export default function LoginPage() {
                   size="lg"
                   width="full"
                   isLoading={isLoading}
-                  bg="black"
+                  // --- THEME FIX: Using your high-contrast black button style ---
+                  bg="gray.900"
                   color="white"
-                  fontSize="md"
-                  fontWeight="500"
-                  height="56px"
-                  borderRadius="xl"
-                  _hover={{
-                    bg: "gray.800",
-                  }}
-                  _active={{
-                    bg: "gray.900",
-                  }}
+                  fontWeight="bold"
+                  _hover={{ bg: "black" }}
+                  _active={{ bg: "gray.700" }}
+                  as={motion.button}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Sign In
                 </Button>
               </VStack>
             </form>
 
-            <HStack justify="space-between" fontSize="sm">
-              <Button
-                variant="link"
-                color="purple.600"
-                fontWeight="500"
-                fontSize="sm"
-              >
+            <HStack justify="space-between" mt={6}>
+              {/* --- THEME FIX: Using your brand's purple for links, which looks great on white --- */}
+              <Link color="purple.600" fontSize="sm" fontWeight="500" _hover={{ textDecoration: 'underline' }}>
                 Forgot Password?
-              </Button>
-              <Button
-                variant="link"
-                color="purple.600"
-                fontWeight="500"
-                fontSize="sm"
-              >
+              </Link>
+              <Link color="purple.600" fontSize="sm" fontWeight="500" _hover={{ textDecoration: 'underline' }}>
                 Create Account
-              </Button>
+              </Link>
             </HStack>
-          </VStack>
-        </Box>
+          </MotionBox>
+        </MotionBox>
       </Container>
     </Box>
   );

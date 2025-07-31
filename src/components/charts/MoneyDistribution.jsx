@@ -5,21 +5,36 @@ import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+// --- FIX: Re-using the same color map for consistency ---
+const ACCOUNT_TYPE_COLORS = {
+  'Checking': '#885AF8', // A nice purple
+  'Savings': '#4FD1C5',  // A nice teal
+  'Investment': '#F6E05E', // A nice yellow
+  'default': '#A0AEC0',    // A fallback gray
+};
+
 export const MoneyDistributionChart = ({ accounts }) => {
-  const accountTypes = ['Gold', 'Titanium', 'Silver'];
+  // --- FIX: Dynamically discover account types from the data ---
+  // 1. Get a list of unique account types.
+  const accountTypes = [...new Set(accounts.map((account) => account.accountType))];
+
+  // 2. Sum the balance for each type.
   const data = accountTypes.map(
     (type) => accounts
-      .filter((account) => account.accountType.toLowerCase() === type.toLowerCase())
+      .filter((account) => account.accountType === type)
       .reduce((sum, account) => sum + account.balance, 0)
   );
+
+  // 3. Get the correct colors.
+  const backgroundColors = accountTypes.map(type => ACCOUNT_TYPE_COLORS[type] || ACCOUNT_TYPE_COLORS.default);
 
   const chartData = {
     labels: accountTypes,
     datasets: [
       {
         data: data,
-        backgroundColor: ['#FFD700', '#B2BEB5', '#C0C0C0'],
-        hoverBackgroundColor: ['#FFC000', '#A2AEA5', '#B0B0B0'],
+        backgroundColor: backgroundColors,
+        hoverBackgroundColor: backgroundColors,
       },
     ],
   };
@@ -37,6 +52,7 @@ export const MoneyDistributionChart = ({ accounts }) => {
             const label = context.label || '';
             const value = context.raw || 0;
             const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+            if (total === 0) return `${label}: $0.00 (0.00%)`; // Prevent division by zero
             const percentage = ((value / total) * 100).toFixed(2);
             return `${label}: $${value.toFixed(2)} (${percentage}%)`;
           },
@@ -56,4 +72,3 @@ export const MoneyDistributionChart = ({ accounts }) => {
     </Box>
   );
 };
-

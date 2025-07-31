@@ -1,6 +1,6 @@
-# Asmas Bank Frontend
+# Asmas Bank Frontend - Portfolio Demo
 
-Welcome to Asmas Bank, a seamless banking experience built with React.js and Chakra UI. This application allows clients to perform everyday banking operations and manage their accounts effortlessly. Additionally, it features a dedicated loan application section for clients to request loans tailored to their needs.
+A modern banking dashboard built with React.js and Chakra UI. This is a portfolio project showcasing a complete banking interface with account management, transaction history, and loan applications. The application uses a mock server to simulate backend functionality for demonstration purposes.
 
 ## Table of Contents
 
@@ -27,10 +27,13 @@ Welcome to Asmas Bank, a seamless banking experience built with React.js and Cha
 ## Technologies Used
 
 - **Frontend Framework:** React.js
+- **Build Tool:** Vite
 - **UI Library:** Chakra UI
-- **State Management:** React Context API / Redux (specify if used)
-- **API Communication:** Axios / Fetch API (specify if used)
+- **Charts:** Recharts, Chart.js
+- **API Communication:** Axios
+- **Mock Server:** Express.js
 - **Styling:** CSS-in-JS via Chakra UI
+- **Icons:** React Icons, Chakra UI Icons
 
 ## Installation and Setup
 
@@ -38,12 +41,12 @@ Follow these steps to set up the application on your local machine:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/projet-fintech/Frontend.git
+   git clone <your-repo-url>
    ```
 
 2. **Navigate to the Project Directory:**
    ```bash
-   cd Frontend
+   cd asmas-bank-frontend
    ```
 
 3. **Install Dependencies:**
@@ -51,21 +54,66 @@ Follow these steps to set up the application on your local machine:
    npm install
    ```
 
-4. **Run the Application:**
+4. **Run the Application with Mock Server:**
    ```bash
+   npm run dev:full
+   ```
+   This will start both the mock API server (port 3001) and the React app (port 5173).
+
+   Alternatively, you can run them separately:
+   ```bash
+   # Terminal 1 - Start mock server
+   npm run mock-server
+   
+   # Terminal 2 - Start React app
    npm run dev
    ```
 
 5. **Access the Application:**
-   Open your browser and navigate to `http://localhost:3000`.
+   Open your browser and navigate to `http://localhost:5173`.
 
 ## Usage
 
 1. **Landing Page:** Explore the bank's services and navigate to the dashboard.
-2. **Client Dashboard:** Log in to your account to access account details, perform transactions, and review transaction history.
+2. **Client Dashboard:** Use the demo credentials to access:
+   - Account overview with multiple account types
+   - Transaction history with filtering and search
+   - Interactive charts and statistics
 3. **Loan Application Section:**
-   - Fill out the loan request form, specifying the purpose and amount.
-   - Submit the application and track its status.
+   - Submit new loan applications
+   - View application status and history
+   - Track approval/rejection status
+
+### Demo Credentials
+- **Username:** demo@asmasbank.com
+- **Password:** Any password (mock authentication)
+
+### Features Working
+- ✅ **Authentication:** Login with any credentials
+- ✅ **Account Management:** View multiple account types (Checking, Savings, Investment)
+- ✅ **Transaction History:** Browse and filter transactions
+- ✅ **Loan Applications:** Submit and track loan applications
+- ✅ **Cards Section:** View account cards with balances
+- ✅ **Dashboard Overview:** Interactive charts and statistics
+- ✅ **Responsive Design:** Works on desktop, tablet, and mobile
+
+## Mock Server
+
+This project includes a custom Express.js mock server that simulates the banking API endpoints:
+
+- **Authentication:** `/auth/login`
+- **Accounts:** `/accounts/client/:clientId`
+- **Transactions:** `/operations/:compteId`
+- **Loans:** `/loan-applications/users/:userId`
+
+The mock server provides realistic sample data for:
+- Multiple account types (Checking, Savings, Investment)
+- Transaction history with various categories
+- Loan applications with different statuses
+
+## Portfolio Note
+
+This is a frontend portfolio project designed to showcase modern React development practices and UI/UX design skills. The backend functionality is simulated using a mock server for demonstration purposes.
 
 ## Screenshots
 
@@ -96,6 +144,35 @@ Contributions are welcome! Follow these steps to contribute:
    git push origin feature-name
    ```
 5. Open a Pull Request.
+
+## Project Structure
+
+```
+├── public/                 # Static assets and images
+├── src/
+│   ├── api/               # API integration layer
+│   ├── assets/            # Shared assets and styles
+│   ├── components/        # Reusable React components
+│   │   ├── buttons/       # Button components
+│   │   ├── cards/         # Card components
+│   │   ├── charts/        # Chart components
+│   │   ├── landing/       # Landing page components
+│   │   └── ...           # Other component categories
+│   ├── pages/            # Page components
+│   └── theme.jsx         # Chakra UI theme configuration
+├── mock-server.js        # Express mock server
+├── mock-data.json        # Sample data for demo
+└── setup.sh             # Quick setup script
+```
+
+## Quick Start
+
+Run the setup script for automatic installation:
+
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
 ## License
 

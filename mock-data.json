@@ -1,0 +1,45 @@
+{
+    "auth": {
+        "login": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiQ0xJRU5UMDAxIiwic3ViIjoiSm9obiBEb2UiLCJlbWFpbCI6ImRlbW9AYXNtYXNiYW5rLmNvbSIsImlhdCI6MTY0MDk5NTIwMCwiZXhwIjoxOTU2NTU5NjAwfQ.mock-signature-long-expiry",
+            "user": { "id": 1, "username": "demo@asmasbank.com", "name": "John Doe", "clientId": "CLIENT001" }
+        }
+    },
+    "accounts": [
+        { "id": "ACC001", "clientId": "CLIENT001", "accountNumber": "1234567890", "accountType": "Checking", "balance": 15750.50, "currency": "USD" },
+        { "id": "ACC002", "clientId": "CLIENT001", "accountNumber": "1234567891", "accountType": "Savings", "balance": 45200.75, "currency": "USD" }
+    ],
+    "cards": [
+        { "id": "CARD001", "clientId": "CLIENT001", "accountId": "ACC001", "cardNumber": "4532 1234 5678 9012", "cardType": "visa", "expiryDate": "12/28", "holderName": "John Doe", "isLocked": false, "isFrozen": false, "color": ["#0ea5e9", "#2563eb"] },
+        { "id": "CARD002", "clientId": "CLIENT001", "accountId": "ACC002", "cardNumber": "5555 1234 5678 9013", "cardType": "mastercard", "isLocked": true, "isFrozen": false, "color": ["#ffd700", "#ffa500"] }
+    ],
+    "transactions": [
+        { "id": "OP001", "accountId": "ACC001", "type": "DEPOSIT", "amount": 2500.00, "description": "Salary Deposit", "date": "2024-07-25" },
+        { "id": "OP002", "accountId": "ACC001", "type": "WITHDRAWAL", "amount": -150.00, "description": "ATM Withdrawal", "date": "2024-07-24" },
+        { "id": "OP003", "accountId": "ACC001", "type": "TRANSFER", "amount": -500.00, "description": "Transfer to Savings", "date": "2024-07-23" },
+        { "id": "OP004", "accountId": "ACC002", "type": "TRANSFER", "amount": 500.00, "description": "Transfer from Checking", "date": "2024-07-23" },
+        { "id": "OP005", "accountId": "ACC001", "type": "PAYMENT", "amount": -85.50, "description": "Grocery Store", "date": "2024-07-22" },
+        { "id": "OP006", "accountId": "ACC001", "type": "PAYMENT", "amount": -45.00, "description": "Gas Station", "date": "2024-07-21" },
+        { "id": "OP007", "accountId": "ACC002", "type": "INTEREST", "amount": 125.75, "description": "Monthly Interest", "date": "2024-07-20" }
+    ],
+    "loans": [
+        { 
+            "id": "LOAN001", 
+            "userId": "CLIENT001", 
+            "loanAmount": 25000, 
+            "purpose": "Home Improvement", 
+            "status": "APPROVED", 
+            "applicationDate": "2024-01-10", 
+            "interestRate": 4.5 
+        },
+        { 
+            "id": "LOAN002", 
+            "userId": "CLIENT001", 
+            "loanAmount": 15000, 
+            "purpose": "Car Purchase", 
+            "status": "PENDING", 
+            "applicationDate": "2024-01-20", 
+            "interestRate": 3.9 
+        }
+    ]
+}

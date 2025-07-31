@@ -8,7 +8,7 @@ import {
   Button 
 } from '@chakra-ui/react';
 import { FiArrowUpRight, FiArrowDownLeft } from 'react-icons/fi';
-import { getAccountsbyClientID, getTransactionsByCompteId } from '../../api/api'; // Assuming these functions are defined in your API module
+import { getAccountsbyClientID, getTransactionsByAccountId } from '../../api/api'; // Assuming these functions are defined in your API module
 import { jwtDecode } from 'jwt-decode'; // Ensure correct version of jwt-decode is installed
 
 function RecentTransactions() {
@@ -34,7 +34,7 @@ function RecentTransactions() {
 
           if (accounts.length > 0) {
             const transactionsPromises = accounts.map((account) =>
-              getTransactionsByCompteId(account.id_account)
+              getTransactionsByAccountId(account.id_account)
             );
 
             // Wait for all transactions to be fetched

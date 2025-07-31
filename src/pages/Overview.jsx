@@ -34,7 +34,7 @@ import RecentTransactions from '../components/transactions/RecentTransactions';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
-import { getAccountsbyClientID, getTransactionsByCompteId } from '../api/api';
+import { getAccountsbyClientID, getTransactionsByAccountId } from '../api/api';
 
 const MotionBox = motion(Box);
 
@@ -96,7 +96,7 @@ function Overview() {
         // Fetch transactions for each account
         const allTransactions = [];
         for (const account of accounts) {
-          const accountTransactions = await getTransactionsByCompteId(account.id_account, token);
+          const accountTransactions = await getTransactionsByAccountId(account.id_account, token);
           allTransactions.push(...accountTransactions);
         }
 
