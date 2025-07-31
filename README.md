@@ -1,181 +1,135 @@
-# Asmas Bank Frontend - Portfolio Demo
+# ASMAS Bank - Modern Fintech Dashboard
 
-A modern banking dashboard built with React.js and Chakra UI. This is a portfolio project showcasing a complete banking interface with account management, transaction history, and loan applications. The application uses a mock server to simulate backend functionality for demonstration purposes.
+![ASMAS Bank Dashboard Showcase](https://github.com/user-attachments/assets/f8ce381f-be05-4e8e-92f0-5eb5fbbdd693)
 
-## Table of Contents
+<p align="center">
+  <strong><a href="https://fintech-dashboard-gray.vercel.app">View Live Demo</a></strong>
+</p>
 
-1. [Features](#features)
-2. [Technologies Used](#technologies-used)
-3. [Installation and Setup](#installation-and-setup)
-4. [Usage](#usage)
-5. [Screenshots](#screenshots)
-6. [Contributing](#contributing)
-7. [License](#license)
+<p align="center">
+  <img alt="React" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img alt="Chakra UI" src="https://img.shields.io/badge/Chakra_UI-319795?style=for-the-badge&logo=chakraui&logoColor=white" />
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img alt="Express.js" src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
+</p>
 
-## Features
+## About This Project
 
-- **Landing Page:** Welcoming interface showcasing the bank's services and features.
-- **Client Dashboard:**
-  - View and manage accounts.
-  - Perform standard banking operations, such as deposits, withdrawals, and transfers.
-  - Track transaction history in real time.
-- **Loan Application Section:**
-  - Request loans for various purposes.
-  - View loan application status and history.
-- **Responsive Design:** Optimized for desktop, tablet, and mobile devices.
+ASMAS Bank is a comprehensive and responsive fintech dashboard built from the ground up to showcase a modern, full-stack development workflow. This is not just a concept; it's a fully functional application designed to demonstrate advanced skills in front-end architecture, UI/UX design, API integration, and back-end simulation.
 
-## Technologies Used
+The project features a complete user journey, from a beautifully designed landing page to a secure, data-rich client dashboard, all powered by a custom-built Express.js mock server.
 
-- **Frontend Framework:** React.js
-- **Build Tool:** Vite
-- **UI Library:** Chakra UI
-- **Charts:** Recharts, Chart.js
-- **API Communication:** Axios
-- **Mock Server:** Express.js
-- **Styling:** CSS-in-JS via Chakra UI
-- **Icons:** React Icons, Chakra UI Icons
+---
 
-## Installation and Setup
+## ✨ Key Features
 
-Follow these steps to set up the application on your local machine:
+-   **Secure User Authentication:** A robust login flow with state management via JWT.
+-   **Comprehensive Multi-Account Dashboard:** An overview of all financial accounts, including real-time balance summaries and income/expense tracking.
+-   **Interactive Data Visualization:** Dynamic charts and graphs built with Recharts and Chart.js to visualize account and money distribution.
+-   **Detailed Transaction History:** A filterable and searchable list of all transactions across all accounts.
+-   **Card Management Interface:** A dedicated section to view and manage virtual cards linked to accounts.
+-   **Full Loan Application System:** A complete module for users to apply for loans and track their application status (Pending, Approved, Rejected).
+-   **Fully Responsive Design:** A seamless experience across desktop, tablet, and mobile devices, built with Chakra UI's responsive design system.
+-   **Custom Mock API:** A hand-crafted Express.js server that provides realistic, structured data and simulates a real-world RESTful API.
 
-1. **Clone the Repository:**
-   ```bash
-   git clone <your-repo-url>
-   ```
+---
 
-2. **Navigate to the Project Directory:**
-   ```bash
-   cd asmas-bank-frontend
-   ```
+## 🛠️ Tech Stack & Tools
 
-3. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
+| Category      | Technology                                                                                                                                                                                          |
+| :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**  | `React.js`, `Vite`, `Chakra UI`, `Axios`, `Framer Motion`, `Recharts`, `Chart.js`, `jwt-decode`                                                                                                         |
+| **Backend**   | `Node.js`, `Express.js`, `cors`                                                                                                                                                                     |
+| **Tooling**   | `ESLint`, `Prettier`, `npm`                                                                                                                                                                           |
+| **Hosting**   | **Frontend:** Vercel/Netlify, **Backend:** Render/Fly.io                                                                                                                                              |
 
-4. **Run the Application with Mock Server:**
-   ```bash
-   npm run dev:full
-   ```
-   This will start both the mock API server (port 3001) and the React app (port 5173).
+---
 
-   Alternatively, you can run them separately:
-   ```bash
-   # Terminal 1 - Start mock server
-   npm run mock-server
-   
-   # Terminal 2 - Start React app
-   npm run dev
-   ```
+## 🚀 Getting Started
 
-5. **Access the Application:**
-   Open your browser and navigate to `http://localhost:5173`.
+Follow these steps to set up and run the project locally.
 
-## Usage
+### Prerequisites
 
-1. **Landing Page:** Explore the bank's services and navigate to the dashboard.
-2. **Client Dashboard:** Use the demo credentials to access:
-   - Account overview with multiple account types
-   - Transaction history with filtering and search
-   - Interactive charts and statistics
-3. **Loan Application Section:**
-   - Submit new loan applications
-   - View application status and history
-   - Track approval/rejection status
+-   Node.js (v18.x or later)
+-   npm
+
+### Installation & Setup
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/SamirTaous/fintech-dashboard.git
+    cd fintech-dashboard
+    ```
+
+2.  **Install Dependencies:**
+    This will install packages for both the client and the mock server.
+    ```bash
+    npm install
+    ```
+
+3.  **Run the Application:**
+    The most convenient way is to run both the front-end and back-end servers concurrently.
+    ```bash
+    npm run dev:full
+    ```
+    This command will:
+    -   Start the mock API server on `http://localhost:3001`
+    -   Start the React development server on `http://localhost:5173`
+
+4.  **Access the App:**
+    Open your browser and navigate to `http://localhost:5173`.
 
 ### Demo Credentials
-- **Username:** demo@asmasbank.com
-- **Password:** Any password (mock authentication)
 
-### Features Working
-- ✅ **Authentication:** Login with any credentials
-- ✅ **Account Management:** View multiple account types (Checking, Savings, Investment)
-- ✅ **Transaction History:** Browse and filter transactions
-- ✅ **Loan Applications:** Submit and track loan applications
-- ✅ **Cards Section:** View account cards with balances
-- ✅ **Dashboard Overview:** Interactive charts and statistics
-- ✅ **Responsive Design:** Works on desktop, tablet, and mobile
+-   **Username:** `demo@asmasbank.com`
+-   **Password:** `password` (any password will work)
 
-## Mock Server
+---
 
-This project includes a custom Express.js mock server that simulates the banking API endpoints:
+## 🏛️ Project Architecture
 
-- **Authentication:** `/auth/login`
-- **Accounts:** `/accounts/client/:clientId`
-- **Transactions:** `/operations/:compteId`
-- **Loans:** `/loan-applications/users/:userId`
+The project is structured for scalability and maintainability, with a clear separation of concerns.
 
-The mock server provides realistic sample data for:
-- Multiple account types (Checking, Savings, Investment)
-- Transaction history with various categories
-- Loan applications with different statuses
-
-## Portfolio Note
-
-This is a frontend portfolio project designed to showcase modern React development practices and UI/UX design skills. The backend functionality is simulated using a mock server for demonstration purposes.
-
-## Screenshots
-
-_![image](https://github.com/user-attachments/assets/f8ce381f-be05-4e8e-92f0-5eb5fbbdd693)
-
-![image](https://github.com/user-attachments/assets/191a68d5-f864-4a64-959a-70f668acd03d)
-
-![image](https://github.com/user-attachments/assets/bd3d8a9a-1fdb-43d9-964b-085532fe1761)
+<details>
+<summary>Click to view project structure</summary>
+/  
+├── public/ # Static assets (favicon, logos)  
+├── src/  
+│ ├── api/ # API service layer (Axios)  
+│ ├── assets/ # Global styles and images  
+│ ├── components/ # Reusable React components (Buttons, Cards, Charts)  
+│ ├── pages/ # Page-level components (Dashboard, Login, Landing)  
+│ ├── App.jsx # Main application component with routing  
+│ └── main.jsx # Application entry point  
+├── mock-server.js # Custom Express.js mock server logic  
+├── mock-data.json # Realistic sample data for the mock server  
+├── .env # Environment variables (VITE_API_URL)  
+└── package.json # Project dependencies and scripts
 
 
+</details>
 
+### Development Decisions
 
-## Contributing
+-   **Custom Express Server:** Instead of a simple `db.json`, a custom Express server was built to more accurately simulate a real-world REST API, including custom logic for different endpoints and providing a more robust demonstration of back-end integration skills.
+-   **Chakra UI:** Chosen for its excellent out-of-the-box accessibility, component-based styling, and powerful theming capabilities, which allowed for rapid development of a consistent and professional UI.
 
-Contributions are welcome! Follow these steps to contribute:
+---
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature-name"
-   ```
-4. Push to your branch:
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a Pull Request.
+## 📸 Gallery
 
-## Project Structure
+| Landing Page                                                                                                                       | Login Page                                           |
+| :--------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------- |
+| ![Landing Page](https://github.com/user-attachments/assets/191a68d5-f864-4a64-959a-70f668acd03d)                                   | ![LoginPage](https://i.imgur.com/bEf0g0O.png)        |
+| **Dashboard Overview**                                                                                                             | **Transactions Page**                                |
+| ![Dashboard Overview](https://github.com/user-attachments/assets/f8ce381f-be05-4e8e-92f0-5eb5fbbdd693)                             | ![TransactionsPage](https://i.imgur.com/lm97aMh.png) |
+| **Cards & Loans**                                                                                                                  | **Responsive Design**                                |
+| ![Cards](https://github.com/user-attachments/assets/bd3d8a9a-1fdb-43d9-964b-085532fe1761)![Loans](https://i.imgur.com/Uzz5BHy.png) | ![ResponsiveDesign](https://i.imgur.com/2Vsp50k.png) |
 
-```
-├── public/                 # Static assets and images
-├── src/
-│   ├── api/               # API integration layer
-│   ├── assets/            # Shared assets and styles
-│   ├── components/        # Reusable React components
-│   │   ├── buttons/       # Button components
-│   │   ├── cards/         # Card components
-│   │   ├── charts/        # Chart components
-│   │   ├── landing/       # Landing page components
-│   │   └── ...           # Other component categories
-│   ├── pages/            # Page components
-│   └── theme.jsx         # Chakra UI theme configuration
-├── mock-server.js        # Express mock server
-├── mock-data.json        # Sample data for demo
-└── setup.sh             # Quick setup script
-```
+---
 
-## Quick Start
-
-Run the setup script for automatic installation:
-
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-## License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
